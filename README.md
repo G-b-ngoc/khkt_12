@@ -15,6 +15,12 @@ npm run seed            # tạo dữ liệu demo (học sinh/lớp/tài khoản 
 npm run dev              # http://localhost:3000
 ```
 
+Chạy test tự động (yêu cầu `npm run dev` đang chạy ở terminal khác, vì test tích hợp gọi HTTP thật):
+
+```bash
+npm test
+```
+
 Tài khoản demo sau khi seed (chỉ dùng cho môi trường phát triển/thử nghiệm — **đổi mật khẩu trước khi dùng dữ liệu thật**):
 
 | Vai trò | Username | Password | Phạm vi |
@@ -33,6 +39,14 @@ Không bao giờ dùng mật khẩu admin mặc định/dễ đoán ở môi tr�
 2. Chạy `npm run seed` một lần trên môi trường đó (seed sẽ từ chối chạy nếu mật khẩu yếu/mặc định).
 3. Đăng nhập bằng tài khoản `admin`, vào trang Tài khoản → đổi mật khẩu ngay.
 4. Từ đó, mọi tài khoản cấp 1/cấp 2 khác đều do admin tạo thủ công trong trang quản trị — hệ thống không có chức năng tự đăng ký.
+
+## Ba cấp phân quyền
+
+- **Cấp 1 — Quản lý lớp**: trạm cất/trả điện thoại tối giản, chỉ thao tác trên lớp được phân công. Giao diện bottom nav pill 4 mục.
+- **Cấp 2 — Giáo viên chủ nhiệm**: theo dõi lớp, xem lịch sử cất/trả (chỉ xem), viết/cập nhật nhận xét, xem báo cáo cuối tuần đã gửi cho lớp mình. Sidebar (desktop) / bottom nav (mobile), 5 mục.
+- **Cấp 3 — Quản trị viên**: dashboard toàn trường, quản lý lớp/học sinh/tài khoản, nhật ký kiểm toán, và khu vực "Hòm thư" để tạo, duyệt, gửi/hoãn/hủy báo cáo cuối tuần — chỉ Cấp 3 mới phát hành được báo cáo tổng hợp.
+
+Chi tiết tiến độ, kết quả test, và các việc còn thiếu: xem [`PROJECT_STATUS.md`](./PROJECT_STATUS.md).
 
 ## Kiến trúc tóm tắt
 

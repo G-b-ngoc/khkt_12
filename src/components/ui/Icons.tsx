@@ -124,3 +124,24 @@ export const LogoutIcon = (p: IconProps) =>
     </>,
     p
   );
+
+/**
+ * Registry tra theo tên — dùng khi danh sách nav được tạo trong Server Component
+ * (layout.tsx) và truyền xuống Client Component (PillBottomNav/Sidebar): component/function
+ * không thể truyền qua ranh giới Server->Client, nhưng chuỗi tên thì được.
+ */
+export const ICONS = {
+  phoneIn: PhoneInIcon,
+  phoneOut: PhoneOutIcon,
+  report: ReportIcon,
+  account: AccountIcon,
+  comment: CommentIcon,
+  dashboard: DashboardIcon,
+  class: ClassIcon,
+  students: StudentsIcon,
+  audit: AuditIcon,
+  mailbox: MailboxIcon,
+  logout: LogoutIcon,
+} as const;
+
+export type IconName = keyof typeof ICONS;

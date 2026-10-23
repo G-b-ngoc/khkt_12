@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import { ICONS } from "@/components/ui/Icons";
 import type { NavItem } from "./PillBottomNav";
 
 export function Sidebar({
@@ -23,6 +24,7 @@ export function Sidebar({
         {items.map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
           const isHighlight = item.href === highlightHref;
+          const Icon = ICONS[item.icon];
           return (
             <Link
               key={item.href}
@@ -36,7 +38,7 @@ export function Sidebar({
                     : "text-text-muted hover:bg-surface-muted hover:text-text"
               )}
             >
-              {item.icon({ className: "h-[18px] w-[18px]" })}
+              <Icon className="h-[18px] w-[18px]" />
               {item.label}
             </Link>
           );

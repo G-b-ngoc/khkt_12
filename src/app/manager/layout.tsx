@@ -2,13 +2,12 @@ import { requirePageRole, getAssignedClassIds } from "@/lib/auth/guard";
 import { prisma } from "@/lib/prisma";
 import { MacTitleBar } from "@/components/ui/MacTitleBar";
 import { PillBottomNav, type NavItem } from "@/components/nav/PillBottomNav";
-import { PhoneInIcon, PhoneOutIcon, ReportIcon, AccountIcon } from "@/components/ui/Icons";
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/manager/checkin", label: "Cất điện thoại", icon: (p) => <PhoneInIcon {...p} /> },
-  { href: "/manager/checkout", label: "Trả điện thoại", icon: (p) => <PhoneOutIcon {...p} /> },
-  { href: "/manager/report", label: "Báo cáo", icon: (p) => <ReportIcon {...p} /> },
-  { href: "/manager/account", label: "Tài khoản lớp", icon: (p) => <AccountIcon {...p} /> },
+  { href: "/manager/checkin", label: "Cất điện thoại", icon: "phoneIn" },
+  { href: "/manager/checkout", label: "Trả điện thoại", icon: "phoneOut" },
+  { href: "/manager/report", label: "Báo cáo", icon: "report" },
+  { href: "/manager/account", label: "Tài khoản lớp", icon: "account" },
 ];
 
 export default async function ManagerLayout({ children }: { children: React.ReactNode }) {
