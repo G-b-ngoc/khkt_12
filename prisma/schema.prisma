@@ -1,0 +1,232 @@
+// THB Phone Manager — Prisma schema
+// Dev/demo dùng SQLite (zero-setup). Đổi sang PostgreSQL cho production:
+// đổi `provider = "postgresql"` + `url = env("DATABASE_URL")` (giữ nguyên mọi model).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  MANAGER // Cấp 1 — người quản lý lớp
+  TEACHER // Cấp 2 — giáo viên chủ nhiệm
+  ADMIN // Cấp 3 — quản trị viên cấp cao
+}
+
+enum AssignmentRole {
+  MANAGER
+  TEACHER
+}
+
+enum StudentStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum TransactionType {
+  CHECK_IN // cất điện thoại
+  CHECK_OUT // trả điện thoại
+}
+
+enum ReportScope {
+  CLASS
+  SCHOOL
+}
+
+enum ReportStatus {
+  DRAFT
+  PREVIEW
+  APPROVED
+  SENT
+  POSTPONED
+  CANCELLED
+  FAILED
+}
+
+enum SendStatus {
+  SUCCESS
+  FAILED
+}
+
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  fullName     String
+  role         Role
+  isLocked     Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastLoginAt  DateTime?
+
+  assignments       ClassAssignment[]
+  sessions          Session[]
+  performedTxns     PhoneTransaction[] @relation("PerformedByUser")
+  comments          TeacherComment[]
+  approvedReports   WeeklyReport[]     @relation("ApprovedByUser")
+  auditLogs         AuditLog[]         @relation("ActorUser")
+
+  @@index([role])
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  userAgent  String?
+
+  @@index([userId])
+}
+
+model Class {
+  id        String   @id @default(cuid())
+  code      String   @unique // ví dụ "12A1"
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignments  ClassAssignment[]
+  students     Student[]
+  transactions PhoneTransaction[]
+  comments     TeacherComment[]
+  reports      WeeklyReport[]
+  recipientCfg ReportScheduleConfig[]
+}
+
+model ClassAssignment {
+  id        String         @id @default(cuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classId   String
+  class     Class          @relation(fields: [classId], references: [id], onDelete: Cascade)
+  role      AssignmentRole
+  createdAt DateTime       @default(now())
+
+  @@unique([userId, classId, role])
+  @@index([classId])
+  @@index([userId])
+}
+
+model Student {
+  id          String        @id @default(cuid())
+  studentCode String        @unique
+  fullName    String
+  classId     String
+  class       Class         @relation(fields: [classId], references: [id], onDelete: Restrict)
+  status      StudentStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  transactions PhoneTransaction[]
+  comments     TeacherComment[]
+
+  @@index([classId])
+}
+
+model PhoneTransaction {
+  id              String          @id @default(cuid())
+  studentId       String
+  student         Student         @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  classId         String
+  class           Class           @relation(fields: [classId], references: [id], onDelete: Restrict)
+  type            TransactionType
+  performedById   String
+  performedBy     User            @relation("PerformedByUser", fields: [performedById], references: [id], onDelete: Restrict)
+  note            String?
+  createdAt       DateTime        @default(now())
+
+  // Bất biến: không có trường updatedAt / không có API update-delete cho bảng này.
+
+  @@index([classId, createdAt])
+  @@index([studentId, createdAt])
+}
+
+model TeacherComment {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([classId])
+}
+
+model WeeklyReport {
+  id                 String       @id @default(cuid())
+  scope              ReportScope
+  classId            String? // null khi scope = SCHOOL
+  class              Class?       @relation(fields: [classId], references: [id], onDelete: Cascade)
+  weekStart          DateTime
+  weekEnd            DateTime
+  status             ReportStatus @default(DRAFT)
+  contentJson        String // JSON string: số liệu tổng hợp + phần nội dung được phép chỉnh sửa
+  contentVersion      Int          @default(1)
+  dataIssues         String? // JSON string: cảnh báo thiếu dữ liệu / giao dịch chưa xác minh
+  approvedById       String?
+  approvedBy         User?        @relation("ApprovedByUser", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt         DateTime?
+  recipientsSnapshot String? // JSON string danh sách email lúc gửi
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  sendLogs ReportSendLog[]
+
+  @@unique([scope, classId, weekStart])
+  @@index([weekStart])
+}
+
+model ReportSendLog {
+  id        String       @id @default(cuid())
+  reportId  String
+  report    WeeklyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  recipient String
+  status    SendStatus
+  adapter   String // "console-preview" | "smtp"
+  error     String?
+  createdAt DateTime     @default(now())
+
+  @@index([reportId])
+}
+
+model ReportScheduleConfig {
+  id          String   @id @default(cuid())
+  classId     String? // null = cấu hình cho báo cáo toàn trường
+  class       Class?   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  cronExpr    String // ví dụ "0 17 * * FRI" — chạy 17h thứ 6 hằng tuần
+  recipients  String // JSON string: danh sách email
+  isActive    Boolean  @default(true)
+  updatedById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([classId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  actor      User     @relation("ActorUser", fields: [actorId], references: [id], onDelete: Restrict)
+  action     String // ví dụ "USER_LOCK", "STUDENT_ARCHIVE", "REPORT_APPROVE_SEND"
+  targetType String // "User" | "Student" | "Class" | "WeeklyReport" | ...
+  targetId   String
+  metadata   String? // JSON string chi tiết (không chứa mật khẩu/token)
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
