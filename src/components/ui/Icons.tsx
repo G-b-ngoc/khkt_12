@@ -115,6 +115,15 @@ export const MailboxIcon = (p: IconProps) =>
     p
   );
 
+export const TrackIcon = (p: IconProps) =>
+  base(
+    <>
+      <path d="M3 12c2.2-4.5 5.8-7 9-7s6.8 2.5 9 7c-2.2 4.5-5.8 7-9 7s-6.8-2.5-9-7z" />
+      <circle cx="12" cy="12" r="2.6" />
+    </>,
+    p
+  );
+
 export const LogoutIcon = (p: IconProps) =>
   base(
     <>
@@ -141,6 +150,7 @@ export const ICONS = {
   students: StudentsIcon,
   audit: AuditIcon,
   mailbox: MailboxIcon,
+  track: TrackIcon,
   logout: LogoutIcon,
 } as const;
 

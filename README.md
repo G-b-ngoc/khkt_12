@@ -43,7 +43,7 @@ Không bao giờ dùng mật khẩu admin mặc định/dễ đoán ở môi tr�
 ## Ba cấp phân quyền
 
 - **Cấp 1 — Quản lý lớp**: trạm cất/trả điện thoại tối giản, chỉ thao tác trên lớp được phân công. Giao diện bottom nav pill 4 mục.
-- **Cấp 2 — Giáo viên chủ nhiệm**: theo dõi lớp, xem lịch sử cất/trả (chỉ xem), viết/cập nhật nhận xét, xem báo cáo cuối tuần đã gửi cho lớp mình. Sidebar (desktop) / bottom nav (mobile), 5 mục.
+- **Cấp 2 — Giáo viên chủ nhiệm**: mục **"Theo dõi"** xem trạng thái cất/trả của cả lớp theo từng ngày (bảng mã HS, họ tên, trạng thái + giờ cất, trạng thái + giờ trả, ghi chú/cần xác minh), có tìm kiếm theo tên/mã (không dấu, không phân biệt hoa/thường) và lọc theo trạng thái — chỉ xem, không thực hiện cất/trả; viết/cập nhật nhận xét; xem báo cáo cuối tuần đã gửi cho lớp mình. Sidebar (desktop) / bottom nav (mobile), 4 mục.
 - **Cấp 3 — Quản trị viên**: dashboard toàn trường, quản lý lớp/học sinh/tài khoản, nhật ký kiểm toán, và khu vực "Hòm thư" để tạo, duyệt, gửi/hoãn/hủy báo cáo cuối tuần — chỉ Cấp 3 mới phát hành được báo cáo tổng hợp.
 
 Chi tiết tiến độ, kết quả test, và các việc còn thiếu: xem [`PROJECT_STATUS.md`](./PROJECT_STATUS.md).

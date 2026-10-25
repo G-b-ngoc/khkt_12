@@ -1,6 +1,6 @@
 # PROJECT_STATUS — THB Phone Manager
 
-Cập nhật: 2026-10-23 (Phase 0–6 hoàn thành: đủ 3 cấp phân quyền + báo cáo cuối tuần + test tự động)
+Cập nhật: 2026-10-25 (Phase 0–6 hoàn thành + gộp menu Cấp 2 thành "Theo dõi")
 
 ## Đã hoàn thành (có backend thật, đã kiểm thử thật — không phải UI minh họa)
 
@@ -14,7 +14,16 @@ Cập nhật: 2026-10-23 (Phase 0–6 hoàn thành: đủ 3 cấp phân quyền 
 Tra cứu học sinh theo mã (scoped đúng lớp), cất/trả điện thoại (validate trạng thái trước khi ghi), xem hoạt động hôm nay, tài khoản lớp. Bottom nav pill 4 mục.
 
 ### Phase 3 — Cấp 2 (Giáo viên chủ nhiệm)
-Dashboard lớp (sidebar macOS desktop / bottom nav mobile), danh sách + tìm kiếm học sinh, trang chi tiết học sinh (lịch sử giao dịch view-only + nhận xét dạng slide-over), trang nhận xét toàn lớp, lịch sử cất/trả view-only có filter ngày (API chặn ghi ở backend, không chỉ ẩn nút), xem báo cáo cuối tuần đã gửi cho lớp mình (không xem được bản nháp/toàn trường). Nav 5 mục.
+Dashboard lớp (sidebar macOS desktop / bottom nav mobile), danh sách + tìm kiếm học sinh, trang chi tiết học sinh (lịch sử giao dịch view-only + nhận xét dạng slide-over), trang nhận xét toàn lớp, xem báo cáo cuối tuần đã gửi cho lớp mình (không xem được bản nháp/toàn trường). Nav 4 mục.
+
+### Phase 7 — Gộp "Cất điện thoại" + "Trả điện thoại" thành "Theo dõi" (2026-10-25)
+Hai mục menu view-only cũ (lịch sử cất riêng / trả riêng, lọc theo ngày) được gộp thành một mục **"Theo dõi"** duy nhất, tái sử dụng lại trang dashboard `/teacher` có sẵn (không tạo route mới):
+- API mới `/api/teacher/overview?date=YYYY-MM-DD` (TEACHER-only, lọc theo đúng `classId` được phân công qua `getAssignedClassIds` — không nhận classId từ client) trả về, cho **đúng 1 ngày**, mỗi học sinh của lớp kèm: `checkInStatus` ("Đã cất"/"Chưa ghi nhận cất"), `checkInAt`, `checkOutStatus` ("Đã trả"/"Cần xác minh"/"Chưa áp dụng"), `checkOutAt`, `note`.
+- Trạng thái suy ra **chỉ từ `PhoneTransaction` thật trong ngày** (hàm `computeDayPhoneState` ở `src/lib/phone.ts`, cùng logic đã dùng khi phát hiện giao dịch dang dở cho báo cáo cuối tuần ở `src/lib/reports.ts`) — "Cần xác minh" chỉ dùng cho đúng 1 trường hợp có dữ liệu xác nhận (đã cất nhưng chưa thấy lượt trả trong ngày); **không** tự suy diễn "vắng mặt"/"vi phạm"/"được miễn" vì hệ thống chưa lưu các trạng thái này.
+- Trang `/teacher`: bảng kiểu Excel (STT, mã HS, họ tên, trạng thái + giờ cất, trạng thái + giờ trả, ghi chú), có cuộn dọc khi lớp đông học sinh; thanh tìm kiếm theo tên/mã chạy hoàn toàn phía client (không gọi lại API khi gõ), không phân biệt hoa/thường và không dấu (`src/lib/search.ts`); bộ lọc theo trạng thái cất/trả; nút làm mới; 5 ô thống kê tính theo đúng tập đã lọc.
+- Đã xóa `src/app/teacher/checkin/`, `src/app/teacher/checkout/`, component `TransactionLog` (không còn nơi dùng); **giữ nguyên** bảng `PhoneTransaction`, endpoint `/api/teacher/transactions` (vẫn còn, không bị dùng bởi UI hiện tại nhưng không xóa vì không được yêu cầu xóa API), toàn bộ chức năng Cấp 1/Cấp 3 và quyền ghi chú của Cấp 2.
+- Kiểm tra lại: `npx tsc --noEmit` sạch, `npm run lint` sạch, `npm test` 26/26 PASS (yêu cầu nạp `.env` vào shell chạy test, xem lưu ý ở mục kiểm thử dưới). Smoke test thủ công bằng curl: `/teacher/checkin` và `/teacher/checkout` trả 404 (đã gỡ), `/teacher` + 3 trang Cấp 2 còn lại trả 200, `/api/teacher/overview` trả 401 khi chưa đăng nhập, 403 khi gọi bằng tài khoản MANAGER hoặc ADMIN, và chỉ trả về đúng lớp được phân công khi gọi bằng 2 tài khoản TEACHER khác lớp. Toàn bộ route Cấp 1 (`/manager/*`) và Cấp 3 (`/admin/*`) đã test lại, vẫn 200/307 như cũ, không bị ảnh hưởng.
+- **Chưa kiểm thử**: chưa viết thêm test Vitest tự động riêng cho `/api/teacher/overview` (mới chỉ xác minh thủ công bằng curl ở trên) — nên coi là việc còn lại nếu muốn test này nằm trong `npm test`. Cũng chưa chụp màn hình thật ở độ rộng điện thoại cho giao diện bảng mới (môi trường hiện tại không có trình duyệt/screenshot, cùng hạn chế đã ghi nhận từ Phase 6).
 
 ### Phase 4 — Cấp 3 (Quản trị viên)
 Dashboard toàn trường, quản lý lớp (CRUD), quản lý học sinh (thêm/sửa, **archive thay hard-delete khi đã có giao dịch** — có kiểm tra ràng buộc dữ liệu thật), quản lý tài khoản (tạo/khóa/mở khóa/đặt lại mật khẩu/gán lại lớp — khóa và đổi mật khẩu đều **thu hồi session đang mở ngay**), trang nhật ký kiểm toán. Sidebar mở rộng + "Hòm thư" nổi bật.

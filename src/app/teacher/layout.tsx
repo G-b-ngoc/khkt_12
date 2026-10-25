@@ -6,8 +6,7 @@ import { Sidebar } from "@/components/nav/Sidebar";
 import { LogoutButton } from "@/components/nav/LogoutButton";
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/teacher/checkin", label: "Cất điện thoại", icon: "phoneIn" },
-  { href: "/teacher/checkout", label: "Trả điện thoại", icon: "phoneOut" },
+  { href: "/teacher", label: "Theo dõi", icon: "track" },
   { href: "/teacher/report", label: "Báo cáo", icon: "report" },
   { href: "/teacher/comments", label: "Nhận xét", icon: "comment" },
   { href: "/teacher/account", label: "Tài khoản", icon: "account" },
