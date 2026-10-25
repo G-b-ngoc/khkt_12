@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { SlideOver } from "@/components/ui/SlideOver";
@@ -62,9 +63,14 @@ export default function AdminClassesPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold text-text">Quản lý lớp</h2>
-        <Button onClick={() => setOpen(true)}>+ Thêm lớp</Button>
+        <div className="flex gap-2">
+          <Link href="/admin/classes/import">
+            <Button variant="secondary">Nhập danh sách từ file</Button>
+          </Link>
+          <Button onClick={() => setOpen(true)}>+ Thêm lớp</Button>
+        </div>
       </div>
 
       {error && <p className="text-sm text-danger">{error}</p>}

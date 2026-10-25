@@ -8,6 +8,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: "dashboard" },
   { href: "/admin/classes", label: "Lớp học", icon: "class" },
   { href: "/admin/students", label: "Học sinh", icon: "students" },
+  { href: "/admin/overview", label: "Theo dõi", icon: "track" },
   { href: "/admin/accounts", label: "Tài khoản", icon: "account" },
   { href: "/admin/audit", label: "Nhật ký", icon: "audit" },
   { href: "/admin/reports", label: "Hòm thư", icon: "mailbox" },

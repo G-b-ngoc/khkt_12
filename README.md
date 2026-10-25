@@ -44,7 +44,19 @@ Không bao giờ dùng mật khẩu admin mặc định/dễ đoán ở môi tr�
 
 - **Cấp 1 — Quản lý lớp**: trạm cất/trả điện thoại tối giản, chỉ thao tác trên lớp được phân công. Giao diện bottom nav pill 4 mục.
 - **Cấp 2 — Giáo viên chủ nhiệm**: mục **"Theo dõi"** xem trạng thái cất/trả của cả lớp theo từng ngày (bảng mã HS, họ tên, trạng thái + giờ cất, trạng thái + giờ trả, ghi chú/cần xác minh), có tìm kiếm theo tên/mã (không dấu, không phân biệt hoa/thường) và lọc theo trạng thái — chỉ xem, không thực hiện cất/trả; viết/cập nhật nhận xét; xem báo cáo cuối tuần đã gửi cho lớp mình. Sidebar (desktop) / bottom nav (mobile), 4 mục.
-- **Cấp 3 — Quản trị viên**: dashboard toàn trường, quản lý lớp/học sinh/tài khoản, nhật ký kiểm toán, và khu vực "Hòm thư" để tạo, duyệt, gửi/hoãn/hủy báo cáo cuối tuần — chỉ Cấp 3 mới phát hành được báo cáo tổng hợp.
+- **Cấp 3 — Quản trị viên**: dashboard toàn trường, quản lý lớp/học sinh/tài khoản (gồm **nhập danh sách học sinh từ file Excel/CSV**, xem trước trước khi ghi), mục **"Theo dõi"** xem bảng cất/trả của BẤT KỲ lớp nào theo ngày và **điều chỉnh trạng thái** (vắng mặt/được miễn/cần xác minh...) qua quy trình bắt buộc lý do, nhật ký kiểm toán, và khu vực "Hòm thư" để tạo, duyệt, gửi/hoãn/hủy báo cáo cuối tuần — chỉ Cấp 3 mới phát hành được báo cáo tổng hợp.
+
+### Nhập danh sách học sinh từ file (Cấp 3)
+
+Vào **Quản lý lớp → Nhập danh sách từ file**:
+1. Chọn lớp có sẵn hoặc tạo lớp mới.
+2. Tải file mẫu (`.xlsx`), điền **Mã HS** và **Họ và tên** (chấp nhận nhiều tên cột khác nhau, không cần đúng thứ tự), rồi tải file lên — hỗ trợ `.xlsx`, `.xls`, `.csv` (UTF-8).
+3. Xem bảng xem trước: dòng mới, dòng cập nhật, dòng bị bỏ qua (mã thuộc lớp khác / trùng mã trong file / thiếu dữ liệu) kèm lý do rõ ràng.
+4. Bấm "Xác nhận nhập" — chỉ phần dữ liệu hợp lệ được ghi vào CSDL trong 1 transaction; không tự xóa học sinh cũ, không tự chuyển lớp, không mất lịch sử/nhận xét đã có.
+
+### Theo dõi cất/trả toàn trường + điều chỉnh trạng thái (Cấp 3)
+
+Mục **"Theo dõi"**: chọn lớp + ngày để xem bảng cất/trả toàn trường (giống Cấp 2 nhưng không giới hạn theo lớp được phân công), tìm kiếm/lọc/sắp xếp, xuất CSV/Excel. Khi phát hiện dữ liệu cần điều chỉnh (ví dụ học sinh vắng mặt có xác nhận, được miễn theo quy định), bấm "Điều chỉnh" trên dòng tương ứng — hệ thống **bắt buộc nhập lý do**, lưu thành một bản ghi điều chỉnh MỚI (không sửa/xóa lịch sử gốc), và có thể xem lại toàn bộ lịch sử điều chỉnh. Giờ/ngày hiển thị theo múi giờ Asia/Ho_Chi_Minh.
 
 Chi tiết tiến độ, kết quả test, và các việc còn thiếu: xem [`PROJECT_STATUS.md`](./PROJECT_STATUS.md).
 
@@ -54,6 +66,7 @@ Chi tiết tiến độ, kết quả test, và các việc còn thiếu: xem [`P
 - **Prisma + SQLite** cho dev/demo — đổi `provider` trong `prisma/schema.prisma` sang `postgresql` khi triển khai thật, không cần đổi logic ứng dụng.
 - **Xác thực tự quản lý** (không dùng NextAuth, xem lý do trong `PROJECT_STATUS.md`): session token ngẫu nhiên, chỉ lưu hash trong DB, có thể thu hồi ngay khi đăng xuất hoặc khi admin khóa tài khoản.
 - **Mọi kiểm tra quyền chạy ở backend** (`src/lib/auth/guard.ts`), theo đúng đối tượng dữ liệu (classId thực tế), không chỉ theo tên vai trò hay ẩn/hiện ở UI.
+- **Đọc/ghi Excel/CSV** dùng `xlsx` (SheetJS) — cài từ `https://cdn.sheetjs.com/...` (không phải npm registry) vì bản npm `xlsx@0.18.5` còn 2 lỗi an ninh chưa có bản vá trên npm (prototype pollution + ReDoS); `npm install` bình thường vẫn lấy đúng bản đã vá vì URL đã ghi sẵn trong `package.json`.
 
 ## Database production
 

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Card, StatusPill } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { matchesSearchQuery } from "@/lib/search";
+import { todayInAppTimezone, formatTimeInAppTimezone } from "@/lib/timezone";
+import { EFFECTIVE_STATUS_LABEL, EFFECTIVE_STATUS_TONE, type EffectiveStatusCode } from "@/lib/overviewStatus";
 
 type OverviewRow = {
   id: string;
@@ -16,22 +18,15 @@ type OverviewRow = {
   checkInStatus: "Đã cất" | "Chưa ghi nhận cất";
   checkOutStatus: "Đã trả" | "Cần xác minh" | "Chưa áp dụng";
   note: string | null;
+  effectiveStatus: EffectiveStatusCode;
+  adjustment: { newStatus: EffectiveStatusCode; reason: string; note: string | null; adjustedByName: string } | null;
 };
 
 type CheckInFilter = "ALL" | "DONE" | "MISSING";
 type CheckOutFilter = "ALL" | "DONE" | "NEEDS_VERIFY" | "NA";
 
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function formatTime(iso: string | null) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
-}
-
 export default function TeacherOverviewPage() {
-  const [date, setDate] = useState(todayStr());
+  const [date, setDate] = useState(todayInAppTimezone());
   const [rows, setRows] = useState<OverviewRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [q, setQ] = useState("");
@@ -94,7 +89,7 @@ export default function TeacherOverviewPage() {
             id="overview-date"
             type="date"
             value={date}
-            max={todayStr()}
+            max={todayInAppTimezone()}
             onChange={(e) => setDate(e.target.value)}
             className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
           />
@@ -197,26 +192,40 @@ export default function TeacherOverviewPage() {
                       </Link>
                     </td>
                     <td className="px-3 py-2">
-                      <StatusPill tone={r.checkInStatus === "Đã cất" ? "success" : "neutral"}>
-                        {r.checkInStatus}
-                      </StatusPill>
+                      {r.adjustment ? (
+                        <StatusPill tone={EFFECTIVE_STATUS_TONE[r.adjustment.newStatus]}>
+                          {EFFECTIVE_STATUS_LABEL[r.adjustment.newStatus]}
+                        </StatusPill>
+                      ) : (
+                        <StatusPill tone={r.checkInStatus === "Đã cất" ? "success" : "neutral"}>
+                          {r.checkInStatus}
+                        </StatusPill>
+                      )}
                     </td>
-                    <td className="px-3 py-2 text-text-muted">{formatTime(r.checkInAt)}</td>
+                    <td className="px-3 py-2 text-text-muted">{formatTimeInAppTimezone(r.checkInAt)}</td>
                     <td className="px-3 py-2">
-                      <StatusPill
-                        tone={
-                          r.checkOutStatus === "Đã trả"
-                            ? "success"
-                            : r.checkOutStatus === "Cần xác minh"
-                              ? "warning"
-                              : "neutral"
-                        }
-                      >
-                        {r.checkOutStatus}
-                      </StatusPill>
+                      {r.adjustment ? (
+                        <StatusPill tone={EFFECTIVE_STATUS_TONE[r.adjustment.newStatus]}>
+                          {EFFECTIVE_STATUS_LABEL[r.adjustment.newStatus]}
+                        </StatusPill>
+                      ) : (
+                        <StatusPill
+                          tone={
+                            r.checkOutStatus === "Đã trả"
+                              ? "success"
+                              : r.checkOutStatus === "Cần xác minh"
+                                ? "warning"
+                                : "neutral"
+                          }
+                        >
+                          {r.checkOutStatus}
+                        </StatusPill>
+                      )}
                     </td>
-                    <td className="px-3 py-2 text-text-muted">{formatTime(r.checkOutAt)}</td>
-                    <td className="px-3 py-2 text-text-muted">{r.note ?? "—"}</td>
+                    <td className="px-3 py-2 text-text-muted">{formatTimeInAppTimezone(r.checkOutAt)}</td>
+                    <td className="px-3 py-2 text-text-muted">
+                      {r.adjustment ? `Cấp 3 điều chỉnh (${r.adjustment.adjustedByName}): ${r.adjustment.reason}` : r.note ?? "—"}
+                    </td>
                   </tr>
                 ))}
               </tbody>

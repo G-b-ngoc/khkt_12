@@ -52,6 +52,22 @@ enum SendStatus {
   FAILED
 }
 
+enum ImportBatchStatus {
+  PENDING // đã xem trước, chờ xác nhận
+  PROCESSING // đang ghi — chặn commit trùng khi bấm xác nhận nhiều lần
+  COMMITTED
+  FAILED
+}
+
+enum DayStatusCode {
+  NOT_RECORDED // Chưa ghi nhận cất
+  CHECKED_IN // Đã cất
+  CHECKED_OUT // Đã trả
+  ABSENT // Vắng mặt (đã xác minh)
+  EXEMPTED // Được miễn / có lý do hợp lệ
+  NEEDS_VERIFICATION // Cần xác minh
+}
+
 model User {
   id           String    @id @default(cuid())
   username     String    @unique
@@ -63,12 +79,14 @@ model User {
   updatedAt    DateTime  @updatedAt
   lastLoginAt  DateTime?
 
-  assignments       ClassAssignment[]
-  sessions          Session[]
-  performedTxns     PhoneTransaction[] @relation("PerformedByUser")
-  comments          TeacherComment[]
-  approvedReports   WeeklyReport[]     @relation("ApprovedByUser")
-  auditLogs         AuditLog[]         @relation("ActorUser")
+  assignments        ClassAssignment[]
+  sessions           Session[]
+  performedTxns      PhoneTransaction[]    @relation("PerformedByUser")
+  comments           TeacherComment[]
+  approvedReports    WeeklyReport[]        @relation("ApprovedByUser")
+  auditLogs          AuditLog[]            @relation("ActorUser")
+  importBatches      ImportBatch[]         @relation("ImportUploadedByUser")
+  dayStatusAdjustments DayStatusAdjustment[] @relation("AdjustedByUser")
 
   @@index([role])
 }
@@ -99,6 +117,8 @@ model Class {
   comments     TeacherComment[]
   reports      WeeklyReport[]
   recipientCfg ReportScheduleConfig[]
+  importBatches ImportBatch[]
+  dayStatusAdjustments DayStatusAdjustment[]
 }
 
 model ClassAssignment {
@@ -127,6 +147,7 @@ model Student {
 
   transactions PhoneTransaction[]
   comments     TeacherComment[]
+  dayStatusAdjustments DayStatusAdjustment[]
 
   @@index([classId])
 }
@@ -229,4 +250,61 @@ model AuditLog {
   @@index([actorId])
   @@index([targetType, targetId])
   @@index([createdAt])
+}
+
+/**
+ * Trạng thái tạm giữa bước "xem trước" và "xác nhận nhập" khi admin nhập danh sách học
+ * sinh từ file (.xlsx/.xls/.csv). rowsJson lưu các dòng đã chuẩn hoá từ lúc xem trước —
+ * khi xác nhận, hệ thống phân loại LẠI (NEW/UPDATE/CLASS_CONFLICT/...) theo dữ liệu
+ * hiện tại trong DB (không tin kết quả xem trước đã cũ). Chuyển PENDING -> PROCESSING
+ * bằng update có điều kiện để 1 batch chỉ được xác nhận đúng 1 lần dù bấm nhiều lần.
+ */
+model ImportBatch {
+  id            String            @id @default(cuid())
+  classId       String
+  class         Class             @relation(fields: [classId], references: [id], onDelete: Cascade)
+  uploadedById  String
+  uploadedBy    User              @relation("ImportUploadedByUser", fields: [uploadedById], references: [id], onDelete: Restrict)
+  fileName      String
+  status        ImportBatchStatus @default(PENDING)
+  rowsJson      String // JSON: [{ rowNumber, studentCode, fullName }]
+  totalRows     Int
+  validRows     Int
+  createdCount  Int?
+  updatedCount  Int?
+  conflictCount Int?
+  duplicateCount Int?
+  invalidCount  Int?
+  errorMessage  String?
+  createdAt     DateTime          @default(now())
+  committedAt   DateTime?
+
+  @@index([classId])
+  @@index([uploadedById])
+}
+
+/**
+ * Điều chỉnh trạng thái cất/trả của 1 học sinh trong 1 ngày cụ thể, do Cấp 3 thực hiện
+ * qua quy trình kiểm soát (bắt buộc lý do). CHỈ GHI THÊM (append-only) — không bao giờ
+ * update/xoá bản ghi cũ, nên lịch sử gốc + mọi lần điều chỉnh trước luôn còn nguyên.
+ * Trạng thái "hiệu lực" của 1 (student, date) = bản ghi có createdAt mới nhất, nếu có;
+ * không có thì suy ra từ PhoneTransaction như bình thường (xem src/lib/overview.ts).
+ */
+model DayStatusAdjustment {
+  id             String        @id @default(cuid())
+  studentId      String
+  student        Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  classId        String
+  class          Class         @relation(fields: [classId], references: [id], onDelete: Cascade)
+  date           DateTime // mốc 00:00 Asia/Ho_Chi_Minh của ngày được điều chỉnh
+  previousStatus String // snapshot trạng thái hiệu lực trước khi điều chỉnh (DayStatusCode dạng string)
+  newStatus      DayStatusCode
+  reason         String
+  note           String?
+  adjustedById   String
+  adjustedBy     User          @relation("AdjustedByUser", fields: [adjustedById], references: [id], onDelete: Restrict)
+  createdAt      DateTime      @default(now())
+
+  @@index([studentId, date])
+  @@index([classId, date])
 }
