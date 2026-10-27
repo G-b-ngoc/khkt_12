@@ -1,13 +1,13 @@
 // THB Phone Manager — Prisma schema
-// Dev/demo dùng SQLite (zero-setup). Đổi sang PostgreSQL cho production:
-// đổi `provider = "postgresql"` + `url = env("DATABASE_URL")` (giữ nguyên mọi model).
+// Production (Vercel) dùng PostgreSQL — SQLite không dùng được trên serverless vì
+// filesystem không ghi được/không persist giữa các lần gọi function.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

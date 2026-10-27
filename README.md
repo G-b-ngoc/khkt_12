@@ -68,13 +68,20 @@ Chi tiết tiến độ, kết quả test, và các việc còn thiếu: xem [`P
 - **Mọi kiểm tra quyền chạy ở backend** (`src/lib/auth/guard.ts`), theo đúng đối tượng dữ liệu (classId thực tế), không chỉ theo tên vai trò hay ẩn/hiện ở UI.
 - **Đọc/ghi Excel/CSV** dùng `xlsx` (SheetJS) — cài từ `https://cdn.sheetjs.com/...` (không phải npm registry) vì bản npm `xlsx@0.18.5` còn 2 lỗi an ninh chưa có bản vá trên npm (prototype pollution + ReDoS); `npm install` bình thường vẫn lấy đúng bản đã vá vì URL đã ghi sẵn trong `package.json`.
 
-## Database production
+## Deploy lên Vercel (production dùng PostgreSQL, không dùng SQLite)
 
-Đổi sang PostgreSQL:
-```prisma
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-```
-rồi `DATABASE_URL="postgresql://..."` trong `.env` và chạy lại `npx prisma migrate dev`.
+SQLite không chạy được trên Vercel (filesystem của serverless function không ghi/được persist giữa các lần gọi), nên `schema.prisma` đã cấu hình `provider = "postgresql"`. Các bước một lần để đưa app lên Vercel:
+
+1. **Tạo Postgres** (miễn phí): trong dashboard Vercel → project → tab **Storage** → **Create Database** → chọn Postgres (Neon), hoặc tạo trực tiếp tại neon.tech/supabase.com rồi lấy connection string dạng `postgresql://...`.
+2. **Xoá migration cũ (dialect SQLite) và tạo lại cho Postgres** — chạy ở máy local:
+   ```bash
+   rm -rf prisma/migrations
+   # .env: trỏ DATABASE_URL sang chuỗi kết nối Postgres vừa tạo ở bước 1
+   npx prisma migrate dev --name init
+   npm run seed   # tạo admin + dữ liệu demo trên DB Postgres này
+   ```
+3. **Biến môi trường trên Vercel** (Project Settings → Environment Variables): `DATABASE_URL` (chuỗi Postgres ở bước 1 — nếu dùng tích hợp Storage của Vercel, kiểm tra đúng tên biến nó tạo ra và đặt/alias thành `DATABASE_URL`), `SESSION_SECRET` (chuỗi ngẫu nhiên dài, khác giá trị dev), `SEED_ADMIN_PASSWORD` (không bắt buộc ở runtime, chỉ cần nếu chạy lại seed).
+4. **Build command**: `package.json` có sẵn script `vercel-build` (`prisma migrate deploy && next build`) — Vercel tự nhận diện script này thay cho `build`, nên các migration mới ở lần deploy sau sẽ tự áp dụng vào DB production.
+5. Deploy lại (push lên git nhánh Vercel đang theo dõi, hoặc `vercel --prod`). Đăng nhập bằng tài khoản `admin` + `SEED_ADMIN_PASSWORD` đã dùng ở bước 2.
+
+Dev local vẫn dùng cùng cấu hình Postgres này qua `.env` (không còn SQLite) — nếu muốn tách DB dev/prod, tạo thêm 1 branch/DB Postgres riêng cho local và chỉ đổi `DATABASE_URL` trong `.env`, không đổi `schema.prisma`.
