@@ -1,15 +1,17 @@
 import clsx from "clsx";
+import Image from "next/image";
 
 const SIZE_CLASS = {
-  sm: { ring: "h-9 w-9 p-[2px]", mark: "text-xs" },
-  md: { ring: "h-11 w-11 p-[2.5px]", mark: "text-sm" },
-  lg: { ring: "h-16 w-16 p-[3px]", mark: "text-2xl" },
+  sm: { ring: "h-9 w-9 p-[2px]", pad: "p-1" },
+  md: { ring: "h-11 w-11 p-[2.5px]", pad: "p-1.5" },
+  lg: { ring: "h-16 w-16 p-[3px]", pad: "p-2" },
 } as const;
 
 /**
  * Biểu tượng thương hiệu THB Phone Manager dùng chung toàn hệ thống (title bar, sidebar,
- * trang đăng nhập) — vòng viền gradient đỏ bao quanh dấu "TP", lấy cảm hứng phong cách
- * avatar cao cấp (vòng gradient quanh hình tròn), không sao chép logo/nhận diện của bên thứ ba.
+ * trang đăng nhập) — logo do người dùng cung cấp (`public/logo.png`, đã tách nền trong suốt),
+ * đặt trong vòng viền gradient đỏ lấy cảm hứng phong cách avatar cao cấp (vòng gradient quanh
+ * hình tròn) để đồng bộ với theme — không sao chép nhận diện của bên thứ ba.
  */
 export function Logo({
   size = "md",
@@ -18,7 +20,7 @@ export function Logo({
   size?: "sm" | "md" | "lg";
   className?: string;
 }) {
-  const { ring, mark } = SIZE_CLASS[size];
+  const { ring, pad } = SIZE_CLASS[size];
   return (
     <span
       className={clsx(
@@ -30,15 +32,16 @@ export function Logo({
         background:
           "linear-gradient(135deg, var(--brand-ring-from), var(--brand-ring-via), var(--brand-ring-to))",
       }}
-      aria-hidden
     >
-      <span
-        className={clsx(
-          "flex h-full w-full items-center justify-center rounded-full bg-accent font-semibold tracking-tight text-accent-foreground",
-          mark
-        )}
-      >
-        TP
+      <span className={clsx("relative h-full w-full rounded-full bg-white", pad)}>
+        <Image
+          src="/logo.png"
+          alt="THB Phone Manager"
+          fill
+          sizes="64px"
+          className="object-contain"
+          priority
+        />
       </span>
     </span>
   );

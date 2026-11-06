@@ -11,6 +11,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "THB Phone Manager",
   description: "Hệ thống quản lý cất/trả điện thoại học sinh",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/favicon.ico",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
