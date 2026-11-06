@@ -125,7 +125,7 @@ export default function AdminAccountsPage() {
 
       <div className="flex flex-col gap-2">
         {accounts?.map((acc) => (
-          <Card key={acc.id} className="p-4">
+          <Card key={acc.id} className="p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-float">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-medium text-text">{acc.fullName} <span className="text-text-muted">· @{acc.username}</span></p>

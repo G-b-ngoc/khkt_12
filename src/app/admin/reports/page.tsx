@@ -113,7 +113,7 @@ export default function AdminReportsPage() {
       <div className="flex flex-col gap-2">
         {reports?.map((r) => (
           <Link key={r.id} href={`/admin/reports/${r.id}`}>
-            <Card className="flex items-center justify-between p-4 transition-colors hover:border-accent/40">
+            <Card className="flex items-center justify-between p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-float">
               <div>
                 <p className="font-medium text-text">
                   {r.scope === "SCHOOL" ? "Toàn trường" : r.classCode}

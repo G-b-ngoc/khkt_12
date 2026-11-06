@@ -1,4 +1,4 @@
-import { requirePageRole } from "@/lib/auth/guard";
+import { requirePageRole, ROLE_LABEL } from "@/lib/auth/guard";
 import { MacTitleBar } from "@/components/ui/MacTitleBar";
 import { PillBottomNav, type NavItem } from "@/components/nav/PillBottomNav";
 import { Sidebar } from "@/components/nav/Sidebar";
@@ -15,11 +15,16 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  await requirePageRole("ADMIN");
+  const user = await requirePageRole("ADMIN");
 
   return (
     <div className="flex min-h-screen flex-col bg-bg md:flex-row">
-      <Sidebar items={NAV_ITEMS} highlightHref="/admin/reports" footer={<LogoutButton />} />
+      <Sidebar
+        items={NAV_ITEMS}
+        highlightHref="/admin/reports"
+        user={{ name: user.fullName, roleLabel: ROLE_LABEL.ADMIN }}
+        footer={<LogoutButton />}
+      />
       <div className="flex min-h-screen flex-1 flex-col">
         <MacTitleBar title="Quản trị hệ thống" subtitle="Toàn trường" titleHref="/admin" />
         <main className="flex-1 px-4 pb-28 pt-5 md:pb-8">{children}</main>

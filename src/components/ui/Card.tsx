@@ -18,6 +18,32 @@ export function Card({
   );
 }
 
+/** Thẻ thống kê dùng chung (dashboard, Theo dõi Cấp 2/Cấp 3) — nâng nhẹ + đổ bóng mềm khi hover. */
+export function StatCard({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone?: "success" | "warning" | "danger";
+}) {
+  const toneClass =
+    tone === "success"
+      ? "text-success"
+      : tone === "warning"
+        ? "text-warning"
+        : tone === "danger"
+          ? "text-danger"
+          : "text-text";
+  return (
+    <Card className="p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-float">
+      <p className="text-xs text-text-muted">{label}</p>
+      <p className={clsx("text-2xl font-semibold", toneClass)}>{value}</p>
+    </Card>
+  );
+}
+
 export function StatusPill({
   tone,
   children,

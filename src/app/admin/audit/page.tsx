@@ -37,7 +37,7 @@ export default function AdminAuditPage() {
 
       <div className="flex flex-col gap-2">
         {logs?.map((l) => (
-          <Card key={l.id} className="p-3 text-sm">
+          <Card key={l.id} className="p-3 text-sm transition-colors duration-150 hover:bg-surface-muted/60">
             <div className="flex items-center justify-between">
               <span className="font-medium text-text">{l.action}</span>
               <span className="text-xs text-text-muted">{new Date(l.createdAt).toLocaleString("vi-VN")}</span>

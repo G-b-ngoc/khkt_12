@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Card, StatusPill } from "@/components/ui/Card";
+import { Card, StatusPill, StatCard } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { matchesSearchQuery } from "@/lib/search";
 import { todayInAppTimezone, formatTimeInAppTimezone } from "@/lib/timezone";
@@ -32,6 +32,8 @@ export default function TeacherOverviewPage() {
   const [q, setQ] = useState("");
   const [checkInFilter, setCheckInFilter] = useState<CheckInFilter>("ALL");
   const [checkOutFilter, setCheckOutFilter] = useState<CheckOutFilter>("ALL");
+  const [exportFormat, setExportFormat] = useState<"xlsx" | "csv">("xlsx");
+  const [exportScope, setExportScope] = useState<"all" | "filtered">("all");
 
   function load(selectedDate: string) {
     fetch(`/api/teacher/overview?date=${selectedDate}`)
@@ -74,6 +76,22 @@ export default function TeacherOverviewPage() {
     [filtered]
   );
 
+  const hasActiveFilter = q.trim() !== "" || checkInFilter !== "ALL" || checkOutFilter !== "ALL";
+  // Nếu không còn bộ lọc nào đang áp dụng, "chỉ xuất kết quả đang lọc" không có ý nghĩa — coi như xuất toàn bộ.
+  const effectiveExportScope = hasActiveFilter ? exportScope : "all";
+
+  // Backend (/api/teacher/overview/export) tự xác định lớp từ phiên đăng nhập, không nhận
+  // classId từ client — nên xuất ở đây không thể lộ dữ liệu lớp khác dù sửa URL thủ công.
+  const exportUrl = useMemo(() => {
+    const params = new URLSearchParams({ date, format: exportFormat, scope: effectiveExportScope });
+    if (effectiveExportScope === "filtered") {
+      if (q) params.set("q", q);
+      if (checkInFilter !== "ALL") params.set("checkIn", checkInFilter);
+      if (checkOutFilter !== "ALL") params.set("checkOut", checkOutFilter);
+    }
+    return `/api/teacher/overview/export?${params.toString()}`;
+  }, [date, exportFormat, effectiveExportScope, q, checkInFilter, checkOutFilter]);
+
   return (
     <div className="mx-auto max-w-6xl space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -83,7 +101,7 @@ export default function TeacherOverviewPage() {
             Lớp bạn được phân công — chỉ xem, không thực hiện cất/trả.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <label htmlFor="overview-date" className="text-sm text-text-muted">Ngày</label>
           <input
             id="overview-date"
@@ -98,6 +116,41 @@ export default function TeacherOverviewPage() {
           </Button>
         </div>
       </div>
+
+      <Card className="flex flex-wrap items-end gap-3 p-3">
+        <div>
+          <label htmlFor="export-scope" className="mb-1 block text-xs text-text-muted">Phạm vi xuất</label>
+          <select
+            id="export-scope"
+            value={effectiveExportScope}
+            onChange={(e) => setExportScope(e.target.value as "all" | "filtered")}
+            className="rounded-lg border border-border bg-surface px-2.5 py-1.5 text-sm outline-none focus:border-accent"
+          >
+            <option value="all">Toàn bộ danh sách lớp ({rows?.length ?? 0})</option>
+            <option value="filtered" disabled={!hasActiveFilter}>
+              Chỉ kết quả đang tìm/lọc {hasActiveFilter ? `(${filtered.length})` : ""}
+            </option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="export-format" className="mb-1 block text-xs text-text-muted">Định dạng</label>
+          <select
+            id="export-format"
+            value={exportFormat}
+            onChange={(e) => setExportFormat(e.target.value as "xlsx" | "csv")}
+            className="rounded-lg border border-border bg-surface px-2.5 py-1.5 text-sm outline-none focus:border-accent"
+          >
+            <option value="xlsx">Excel (.xlsx)</option>
+            <option value="csv">CSV</option>
+          </select>
+        </div>
+        <a href={exportUrl}>
+          <Button variant="secondary" size="md">⬇ Tải xuống báo cáo</Button>
+        </a>
+        <p className="w-full text-xs text-text-muted">
+          File chỉ gồm học sinh lớp bạn được phân công, đúng ngày {date} đang xem ở trên.
+        </p>
+      </Card>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         <StatCard label="Tổng học sinh" value={stats.total} />
@@ -234,23 +287,5 @@ export default function TeacherOverviewPage() {
         )}
       </Card>
     </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone?: "success" | "warning";
-}) {
-  const toneClass = tone === "success" ? "text-success" : tone === "warning" ? "text-warning" : "text-text";
-  return (
-    <Card className="p-4">
-      <p className="text-xs text-text-muted">{label}</p>
-      <p className={`text-2xl font-semibold ${toneClass}`}>{value}</p>
-    </Card>
   );
 }

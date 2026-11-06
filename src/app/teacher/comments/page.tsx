@@ -94,7 +94,7 @@ export default function TeacherCommentsPage() {
 
       <div className="flex flex-col gap-3">
         {comments?.map((c) => (
-          <Card key={c.id} className="p-4">
+          <Card key={c.id} className="p-4 transition-colors duration-150 hover:bg-surface-muted/60">
             <Link href={`/teacher/students/${c.studentId}`} className="text-sm font-medium text-accent hover:underline">
               {c.studentName} · {c.studentCode}
             </Link>

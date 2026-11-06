@@ -78,7 +78,7 @@ export default function AdminClassesPage() {
 
       <div className="flex flex-col gap-2">
         {classes?.map((c) => (
-          <Card key={c.id} className="p-4">
+          <Card key={c.id} className="p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-float">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-text">{c.code} — {c.name}</p>

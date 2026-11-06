@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Card, StatusPill } from "@/components/ui/Card";
+import { Card, StatusPill, StatCard } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { SlideOver } from "@/components/ui/SlideOver";
 import { useToast } from "@/components/ui/Toast";
@@ -322,7 +322,7 @@ export default function AdminOverviewPage() {
                 </thead>
                 <tbody>
                   {history.map((h) => (
-                    <tr key={h.id} className="border-b border-border last:border-b-0">
+                    <tr key={h.id} className="border-b border-border last:border-b-0 transition-colors duration-150 hover:bg-surface-muted/60">
                       <td className="py-2">
                         {h.fullName} <span className="text-text-muted">· {h.studentCode}</span>
                       </td>
@@ -478,15 +478,5 @@ export default function AdminOverviewPage() {
         )}
       </SlideOver>
     </div>
-  );
-}
-
-function StatCard({ label, value, tone }: { label: string; value: number; tone?: "success" | "warning" }) {
-  const toneClass = tone === "success" ? "text-success" : tone === "warning" ? "text-warning" : "text-text";
-  return (
-    <Card className="p-4">
-      <p className="text-xs text-text-muted">{label}</p>
-      <p className={`text-2xl font-semibold ${toneClass}`}>{value}</p>
-    </Card>
   );
 }

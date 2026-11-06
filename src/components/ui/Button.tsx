@@ -7,9 +7,10 @@ type Variant = "primary" | "secondary" | "danger" | "ghost";
 type Size = "md" | "lg";
 
 const VARIANT_CLASS: Record<Variant, string> = {
-  primary: "bg-accent text-accent-foreground hover:bg-accent/90 disabled:bg-accent/40",
+  primary:
+    "bg-accent text-accent-foreground shadow-sm hover:bg-accent-hover hover:shadow-card disabled:bg-accent/40 disabled:shadow-none",
   secondary:
-    "bg-surface-muted text-text border border-border hover:bg-border/60 disabled:opacity-50",
+    "bg-surface-muted text-text border border-border hover:border-accent/30 hover:bg-accent/5 disabled:opacity-50",
   danger: "bg-danger text-white hover:bg-danger/90 disabled:bg-danger/40",
   ghost: "bg-transparent text-text hover:bg-surface-muted disabled:opacity-40",
 };
@@ -35,7 +36,8 @@ export function Button({
   return (
     <button
       className={clsx(
-        "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors duration-150 cursor-pointer disabled:cursor-not-allowed",
+        "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 cursor-pointer active:translate-y-0 disabled:cursor-not-allowed disabled:translate-y-0 disabled:hover:shadow-none",
+        !disabled && !loading && "hover:-translate-y-0.5",
         VARIANT_CLASS[variant],
         SIZE_CLASS[size],
         className

@@ -4,6 +4,7 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Logo } from "@/components/ui/Logo";
 
 const ROLE_HOME: Record<string, string> = {
   MANAGER: "/manager",
@@ -47,8 +48,8 @@ export default function LoginPage() {
     <main className="flex min-h-screen flex-1 items-center justify-center bg-bg px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-xl font-semibold text-accent-foreground shadow-card">
-            TP
+          <div className="mx-auto mb-3">
+            <Logo size="lg" />
           </div>
           <h1 className="text-xl font-semibold text-text">THB Phone Manager</h1>
           <p className="mt-1 text-sm text-text-muted">Đăng nhập để tiếp tục</p>

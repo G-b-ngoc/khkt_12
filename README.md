@@ -43,7 +43,7 @@ Không bao giờ dùng mật khẩu admin mặc định/dễ đoán ở môi tr�
 ## Ba cấp phân quyền
 
 - **Cấp 1 — Quản lý lớp**: trạm cất/trả điện thoại tối giản, chỉ thao tác trên lớp được phân công. Giao diện bottom nav pill 4 mục.
-- **Cấp 2 — Giáo viên chủ nhiệm**: mục **"Theo dõi"** xem trạng thái cất/trả của cả lớp theo từng ngày (bảng mã HS, họ tên, trạng thái + giờ cất, trạng thái + giờ trả, ghi chú/cần xác minh), có tìm kiếm theo tên/mã (không dấu, không phân biệt hoa/thường) và lọc theo trạng thái — chỉ xem, không thực hiện cất/trả; viết/cập nhật nhận xét; xem báo cáo cuối tuần đã gửi cho lớp mình. Sidebar (desktop) / bottom nav (mobile), 4 mục.
+- **Cấp 2 — Giáo viên chủ nhiệm**: mục **"Theo dõi"** xem trạng thái cất/trả của cả lớp theo từng ngày (bảng mã HS, họ tên, trạng thái + giờ cất, trạng thái + giờ trả, ghi chú/cần xác minh), có tìm kiếm theo tên/mã (không dấu, không phân biệt hoa/thường), lọc theo trạng thái và **tải xuống báo cáo Excel/CSV** (toàn bộ lớp hoặc chỉ kết quả đang lọc, đúng ngày đang xem) — chỉ xem, không thực hiện cất/trả; viết/cập nhật nhận xét; xem báo cáo cuối tuần đã gửi cho lớp mình. Sidebar (desktop) / bottom nav (mobile), 4 mục.
 - **Cấp 3 — Quản trị viên**: dashboard toàn trường, quản lý lớp/học sinh/tài khoản (gồm **nhập danh sách học sinh từ file Excel/CSV**, xem trước trước khi ghi), mục **"Theo dõi"** xem bảng cất/trả của BẤT KỲ lớp nào theo ngày và **điều chỉnh trạng thái** (vắng mặt/được miễn/cần xác minh...) qua quy trình bắt buộc lý do, nhật ký kiểm toán, và khu vực "Hòm thư" để tạo, duyệt, gửi/hoãn/hủy báo cáo cuối tuần — chỉ Cấp 3 mới phát hành được báo cáo tổng hợp.
 
 ### Nhập danh sách học sinh từ file (Cấp 3)

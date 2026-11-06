@@ -9,6 +9,13 @@ const ROLE_HOME: Record<Role, string> = {
   ADMIN: "/admin",
 };
 
+/** Nhãn hiển thị cho vai trò — dùng ở sidebar (khu vực thông tin người dùng) và trang quản lý tài khoản. */
+export const ROLE_LABEL: Record<Role, string> = {
+  MANAGER: "Cấp 1 — Quản lý lớp",
+  TEACHER: "Cấp 2 — Giáo viên chủ nhiệm",
+  ADMIN: "Cấp 3 — Quản trị viên",
+};
+
 export class AuthzError extends Error {
   status: number;
   constructor(message: string, status: number) {

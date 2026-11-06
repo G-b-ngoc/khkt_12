@@ -320,7 +320,7 @@ export default function AdminImportStudentsPage() {
               </thead>
               <tbody>
                 {preview.rows.map((r) => (
-                  <tr key={r.rowNumber} className="border-b border-border last:border-b-0">
+                  <tr key={r.rowNumber} className="border-b border-border last:border-b-0 transition-colors duration-150 hover:bg-surface-muted/60">
                     <td className="px-3 py-2 text-text-muted">{r.rowNumber}</td>
                     <td className="px-3 py-2 font-medium text-text">{r.studentCode || "—"}</td>
                     <td className="px-3 py-2">{r.fullName || "—"}</td>
@@ -387,7 +387,7 @@ export default function AdminImportStudentsPage() {
               </thead>
               <tbody>
                 {history.map((h) => (
-                  <tr key={h.id} className="border-b border-border last:border-b-0">
+                  <tr key={h.id} className="border-b border-border last:border-b-0 transition-colors duration-150 hover:bg-surface-muted/60">
                     <td className="py-2 text-text-muted">{new Date(h.createdAt).toLocaleString("vi-VN")}</td>
                     <td className="py-2">{h.fileName}</td>
                     <td className="py-2">{h.uploadedByName}</td>

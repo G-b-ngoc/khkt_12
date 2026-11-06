@@ -27,6 +27,11 @@ export function toXlsxBuffer<T>(rows: T[], columns: ExportColumn<T>[], sheetName
   const header = columns.map((c) => c.header);
   const body = rows.map((row) => columns.map((c) => sanitizeCell(c.value(row))));
   const sheet = XLSX.utils.aoa_to_sheet([header, ...body]);
+  // Độ rộng cột theo nội dung dài nhất (giới hạn 10–48 ký tự) để file mở ra không bị cắt chữ.
+  sheet["!cols"] = columns.map((c, i) => {
+    const longest = Math.max(c.header.length, ...body.map((r) => r[i]?.length ?? 0));
+    return { wch: Math.min(48, Math.max(10, longest + 2)) };
+  });
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, sheet, sheetName);
   return XLSX.write(wb, { type: "buffer", bookType: "xlsx" }) as Buffer;

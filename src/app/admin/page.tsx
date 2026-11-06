@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/Card";
+import { Card, StatCard } from "@/components/ui/Card";
 
 type Dashboard = {
   classCount: number;
@@ -43,10 +43,7 @@ export default function AdminDashboardPage() {
     <div className="mx-auto max-w-4xl space-y-5">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {stats.map((s) => (
-          <Card key={s.label} className="p-4">
-            <p className="text-xs text-text-muted">{s.label}</p>
-            <p className="text-2xl font-semibold text-text">{s.value}</p>
-          </Card>
+          <StatCard key={s.label} label={s.label} value={s.value} />
         ))}
       </div>
 
@@ -62,7 +59,7 @@ export default function AdminDashboardPage() {
           </thead>
           <tbody>
             {data.perClass.map((c) => (
-              <tr key={c.classCode} className="border-t border-border">
+              <tr key={c.classCode} className="border-t border-border transition-colors duration-150 hover:bg-surface-muted/60">
                 <td className="py-2">{c.classCode}</td>
                 <td className="py-2 text-right">{c.studentCount}</td>
                 <td className="py-2 text-right">{c.checkInsToday}</td>

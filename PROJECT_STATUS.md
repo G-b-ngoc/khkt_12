@@ -1,6 +1,6 @@
 # PROJECT_STATUS — THB Phone Manager
 
-Cập nhật: 2026-10-25 (Phase 0–8: đủ 3 cấp phân quyền + báo cáo cuối tuần + test tự động + nhập danh sách từ file + Theo dõi toàn trường/điều chỉnh trạng thái)
+Cập nhật: 2026-11-06 (Phase 0–9: đủ 3 cấp phân quyền + báo cáo cuối tuần + test tự động + nhập danh sách từ file + Theo dõi toàn trường/điều chỉnh trạng thái + xuất báo cáo Cấp 2 + nâng cấp giao diện toàn hệ thống)
 
 ## Đã hoàn thành (có backend thật, đã kiểm thử thật — không phải UI minh họa)
 
@@ -54,6 +54,23 @@ Tạo bản dự thảo theo lớp + toàn trường (phát hiện học sinh kh
 - Lịch sử điều chỉnh: `GET /api/admin/overview/adjustments` — không có API sửa/xoá (bảo vệ nhật ký).
 - Xuất dữ liệu: `GET /api/admin/overview/export` (CSV/`.xlsx`, đúng lớp/ngày/bộ lọc đang xem, chống Excel formula injection bằng tiền tố `'`, giữ mã HS dạng chuỗi, có BOM cho CSV tiếng Việt, ghi `AuditLog` mỗi lần xuất).
 - Đã xác nhận bằng test: điều chỉnh trạng thái **không** chạm vào bảng `WeeklyReport` — báo cáo đã tạo/đã gửi giữ nguyên `contentJson`/`contentVersion`/`status` sau khi có điều chỉnh liên quan tới cùng tuần.
+
+### Phase 9 — Xuất báo cáo Theo dõi (Cấp 2) + nâng cấp giao diện toàn hệ thống (2026-11-06)
+
+**A. Tải xuống báo cáo Theo dõi (Cấp 2)**: nút mới trên `/teacher` xuất Excel/CSV đúng ngày đang xem, chọn được "toàn bộ danh sách lớp" hoặc "chỉ kết quả đang tìm/lọc". API mới `GET /api/teacher/overview/export` lấy classId từ `getAssignedClassIds(user, "TEACHER")` (phiên đăng nhập) — **không có tham số classId trên URL**, nên không có cách nào xuất lớp khác dù sửa query string thủ công; đã xác minh bằng curl thật: MANAGER gọi → 403, chưa đăng nhập → 401, 2 tài khoản TEACHER khác lớp (`teacher_12a1`/`teacher_12a2`) mỗi người chỉ nhận file đúng lớp mình (`Bao_cao_THB_Lop_12A1_...` / `..._12A2_...`). Tái sử dụng `getClassesDayOverview`, `toCsv`/`toXlsxBuffer` có sẵn — không thêm logic tính trạng thái mới. `toXlsxBuffer` được nâng cấp thêm tính độ rộng cột tự động (dùng chung cho cả export Cấp 2 và Cấp 3).
+
+**B. Nâng cấp giao diện (logo, theme đỏ, bỏ 3 chấm macOS, hover, sidebar)**:
+- Logo "TP" trong vòng tròn viền gradient đỏ (`src/components/ui/Logo.tsx`) dùng đồng nhất ở trang đăng nhập, title bar (mọi trang) và đầu sidebar (Cấp 2/3) — không còn nơi nào tự vẽ icon thương hiệu riêng.
+- Xóa hoàn toàn 3 chấm tròn xanh/vàng/đỏ (vị trí render duy nhất là `MacTitleBar.tsx`), căn lại tiêu đề theo chiều trái, bỏ padding bù dùng để căn giữa trước đó.
+- Đổi màu nhận diện chủ đạo từ xanh dương sang đỏ (`src/app/globals.css`, biến `--accent`/`--accent-hover`), tách riêng sắc đỏ cảnh báo lỗi (`--danger`) để không lẫn với màu thương hiệu; toàn bộ UI lấy màu qua token CSS (đã rà soát, không có màu hard-code ở component/page nào khác) nên đổi 1 nơi là áp dụng toàn hệ thống.
+- Hiệu ứng hover 150–200ms cho nút, thẻ thống kê, hàng bảng, thẻ danh sách, logo — tôn trọng `prefers-reduced-motion` qua rule CSS toàn cục.
+- Sidebar (Cấp 2/3) thêm logo + tên thương hiệu ở đầu, vạch nhấn đỏ bên trái mục đang chọn, khu vực hiển thị tên + cấp quyền người dùng phía trên nút đăng xuất (nhãn vai trò dùng chung `ROLE_LABEL` mới ở `src/lib/auth/guard.ts`).
+- Gộp 2 bản sao `StatCard` trùng lặp thành 1 component chung trong `src/components/ui/Card.tsx`.
+
+**Đã kiểm tra bằng smoke-test HTTP thật (không chỉ `npm run build`, theo đúng bài học Phase 6)**: `npx tsc --noEmit` sạch, `npm run lint` sạch, `npm run build` PASS. Chạy `npm run dev` thật và curl với cookie đăng nhập: toàn bộ trang Cấp 1 (`/manager/checkin`, `/manager/checkout`, `/manager/report`, `/manager/account`) và Cấp 2 (`/teacher`, `/teacher/report`, `/teacher/comments`, `/teacher/account`) trả 200, HTML không còn chuỗi `traffic-red`/`traffic-yellow`/`traffic-green`, trang `/teacher` có chứa nút "Tải xuống báo cáo" mới. API export mới trả đúng `Content-Disposition` theo mẫu `Bao_cao_THB_Lop_[MãLớp]_[Ngày].xlsx`, file `.xlsx`/`.csv` tải về mở được, cột không bị mất số 0 đầu của mã HS.
+
+**Chưa kiểm tra được bằng HTTP thật trong lần này**: các trang `/admin/*` — mật khẩu admin trong `.env` không khớp với DB Postgres (Neon) đang kết nối ở máy này nên chưa đăng nhập được bằng tài khoản admin thật để curl trực tiếp (chủ động không tạo session/đổi mật khẩu admin để bypass vì đó là thao tác nhạy cảm trên dữ liệu thật). Mức độ tin cậy vẫn cao vì: (1) `Sidebar`/`MacTitleBar` dùng ở `/admin/*` là **cùng component, cùng dạng prop** (`user: {name, roleLabel}`, `items` dạng tên icon chuỗi) đã xác nhận render đúng qua Cấp 2 ở trên — không có nhánh logic riêng cho ADMIN có thể gãy khác; (2) `npx tsc --noEmit` xác nhận đúng kiểu cho toàn bộ trang `/admin/*`. Vẫn nên tự xác nhận bằng mắt trước khi coi là xong, xem mục "Việc cần bạn quyết định".
+- Kiểm tra giao diện responsive bằng mắt ở độ rộng điện thoại thật: môi trường hiện tại không có công cụ trình duyệt/screenshot, giống hạn chế đã ghi nhận từ Phase 6/7/8 — các class Tailwind responsive (`flex-wrap`, `md:flex`, `sm:grid-cols-*`) được giữ/áp dụng nhất quán với pattern cũ nhưng chưa xác nhận bằng ảnh chụp thật.
 
 ## Kết quả kiểm thử thực tế
 
@@ -131,9 +148,9 @@ Các case khóa tài khoản + đăng nhập lại sau khi khóa đã kiểm th�
 ## Rủi ro
 
 - **Bài học quan trọng đã rút ra**: `npm run build` không đủ để xác nhận trang hoạt động — phải render thật (hoặc ít nhất smoke-test HTTP) mọi route trước khi báo hoàn thành. Đã áp dụng lại cho toàn bộ dự án ở Phase 6.
-- SQLite dùng cho dev/demo — triển khai thật nhiều người dùng đồng thời nên chuyển sang PostgreSQL (đổi `provider` trong `schema.prisma`, logic không đổi).
+- Đã chuyển `provider` trong `schema.prisma` từ SQLite sang `postgresql` (commit trước Phase 9) — `.env.local` ở máy này trỏ `DATABASE_URL` sang một DB Neon Postgres thật (dùng cho Vercel). Khi smoke-test Phase 9 bằng curl, đây là DB được dùng trực tiếp — không chạy lệnh hủy/ghi đè dữ liệu (`migrate reset`, seed lại...), chỉ gọi các API đọc + 2 lượt gọi API xuất báo cáo (ghi thêm vài session đăng nhập demo bình thường + 2 dòng `AuditLog` hành động `TEACHER_OVERVIEW_EXPORT`, không khác gì người dùng thật bấm nút) nên không ảnh hưởng dữ liệu nghiệp vụ hiện có.
 - Prisma 8 (RC) đã bị gỡ xuống Prisma 6 (ổn định) — tránh `npm update` tự động nâng lại Prisma 8 cho tới khi bản ổn định chính thức ra mắt.
-- `prisma/dev.db` là CSDL dev dùng chung qua nhiều phiên làm việc/test thủ công — trong lúc kiểm thử Phase 8 phát hiện học sinh demo `HS1203` (lớp 12A1) không còn tồn tại trong DB (không phải do code Phase 8 xoá — đã xác nhận bằng cách đọc trực tiếp DB trước khi chạy test liên quan), nhiều khả năng còn sót lại từ một lần test tay/API ở phiên trước. Không ảnh hưởng tới tính đúng của tính năng (test đã đổi sang dùng `HS1205`), nhưng nếu muốn dữ liệu demo sạch như seed ban đầu, chạy lại `npx prisma migrate reset` + `npm run seed`.
+- Mật khẩu tài khoản `admin` lưu trong `.env` của máy này **không khớp** với DB Neon đang kết nối (có thể do `.env` cục bộ và DB đã bị seed lệch nhau ở một thời điểm trước đó) — xem mục "Việc cần bạn quyết định" #4. Các tài khoản demo Cấp 1/Cấp 2 (`manager_12a1`, `teacher_12a1`, `teacher_12a2`, mật khẩu `Demo@123`) vẫn đăng nhập được bình thường.
 - `xlsx` (SheetJS) đã cài từ CDN chính chủ thay vì npm registry để tránh 2 lỗi an ninh chưa có bản vá trên npm — khi `npm install` lại từ đầu, nếu môi trường chặn tải từ `cdn.sheetjs.com` thì bước cài sẽ lỗi; cần cho phép domain này hoặc đổi sang nguồn khác.
 
 ## Việc cần bạn quyết định
@@ -141,9 +158,10 @@ Các case khóa tài khoản + đăng nhập lại sau khi khóa đã kiểm th�
 1. Repo git cũ ở `C:\Users\NGOC BAO` (home dir, chỉ 1 file README 28 bytes không liên quan) — xóa `.git` đó hay để nguyên?
 2. Khi triển khai thật: cấu hình SMTP thật (host/port/user/password) hay dùng chế độ xem trước là đủ cho bản nộp KHKT?
 3. Có cần xây lịch gửi báo cáo tự động (cron hàng tuần) hay admin bấm tạo dự thảo thủ công mỗi tuần là đủ cho phạm vi đề tài?
+4. **Mới (Phase 9)**: mật khẩu admin đúng của DB Postgres (Neon) đang kết nối là gì? Chưa xác nhận được bằng mắt/HTTP thật giao diện mới của `/admin/*` (dashboard, sidebar, theme đỏ, nút xuất dữ liệu Cấp 3) vì chưa đăng nhập được bằng tài khoản admin thật — cần bạn cung cấp mật khẩu, tự kiểm tra, hoặc đồng ý chạy lại `npm run seed` với `SEED_ADMIN_PASSWORD` mới (sẽ đổi mật khẩu admin thật trong DB).
 
 ## 3 việc tiếp theo
 
-1. Tự kiểm tra responsive bằng mắt ở độ rộng ~400px cho toàn bộ giao diện, đặc biệt 2 trang mới `/admin/classes/import` và `/admin/overview` (cần công cụ trình duyệt/screenshot).
-2. (Nếu cần) Xây API/UI cấu hình `ReportScheduleConfig` (lịch cron + người nhận mặc định) để không phải nhập tay mỗi lần — vẫn chưa làm, không nằm trong phạm vi Phase 8.
-3. Viết thêm test mô phỏng lỗi giữa transaction nhập file (ví dụ throw lỗi có kiểm soát trong 1 bản build test riêng) nếu muốn có bằng chứng tự động cho "không để lại dữ liệu dở dang", thay vì chỉ xác nhận bằng đọc code như hiện tại.
+1. Xác nhận bằng mắt/HTTP thật giao diện mới trên `/admin/*` sau khi có mật khẩu admin đúng (xem mục quyết định #4) — Cấp 1/Cấp 2 đã xác nhận xong trong Phase 9.
+2. Tự kiểm tra responsive bằng mắt ở độ rộng ~400px cho toàn bộ giao diện, đặc biệt các trang nhiều cột/bảng (`/admin/classes/import`, `/admin/overview`, `/teacher` sau khi thêm khối xuất báo cáo) — cần công cụ trình duyệt/screenshot, môi trường hiện tại chưa có.
+3. (Nếu cần) Xây API/UI cấu hình `ReportScheduleConfig` (lịch cron + người nhận mặc định) để không phải nhập tay mỗi lần — vẫn chưa làm, không nằm trong phạm vi Phase 8/9.

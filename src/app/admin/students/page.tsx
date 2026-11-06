@@ -119,7 +119,7 @@ export default function AdminStudentsPage() {
           </thead>
           <tbody>
             {students?.map((s) => (
-              <tr key={s.id} className="border-b border-border last:border-b-0">
+              <tr key={s.id} className="border-b border-border last:border-b-0 transition-colors duration-150 hover:bg-surface-muted/60">
                 <td className="px-4 py-2.5">
                   <p className="font-medium text-text">{s.fullName}</p>
                   <p className="text-xs text-text-muted">{s.studentCode}</p>

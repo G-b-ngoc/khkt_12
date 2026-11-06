@@ -43,11 +43,17 @@ export function PillBottomNav({
               key={item.href}
               href={item.href}
               className={clsx(
-                "flex min-w-[64px] flex-1 flex-col items-center gap-0.5 rounded-[calc(var(--radius-pill)-4px)] px-2 py-2 text-[11px] font-medium transition-colors",
-                active ? "bg-accent/10 text-accent" : "text-text-muted hover:text-text"
+                "group flex min-w-[64px] flex-1 flex-col items-center gap-0.5 rounded-[calc(var(--radius-pill)-4px)] px-2 py-2 text-[11px] font-medium transition-all duration-150",
+                active ? "bg-accent/10 text-accent" : "text-text-muted hover:bg-surface-muted hover:text-text"
               )}
             >
-              <Icon className="h-5 w-5" />
+              <Icon
+                className={clsx(
+                  "h-5 w-5 transition-transform duration-150",
+                  !active && "group-hover:scale-110",
+                  active && "scale-105"
+                )}
+              />
               {item.label}
             </Link>
           );

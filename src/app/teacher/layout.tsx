@@ -1,4 +1,4 @@
-import { requirePageRole, getAssignedClassIds } from "@/lib/auth/guard";
+import { requirePageRole, getAssignedClassIds, ROLE_LABEL } from "@/lib/auth/guard";
 import { prisma } from "@/lib/prisma";
 import { MacTitleBar } from "@/components/ui/MacTitleBar";
 import { PillBottomNav, type NavItem } from "@/components/nav/PillBottomNav";
@@ -20,7 +20,11 @@ export default async function TeacherLayout({ children }: { children: React.Reac
 
   return (
     <div className="flex min-h-screen flex-col bg-bg md:flex-row">
-      <Sidebar items={NAV_ITEMS} footer={<LogoutButton />} />
+      <Sidebar
+        items={NAV_ITEMS}
+        user={{ name: user.fullName, roleLabel: ROLE_LABEL.TEACHER }}
+        footer={<LogoutButton />}
+      />
       <div className="flex min-h-screen flex-1 flex-col">
         <MacTitleBar
           title="Giáo viên chủ nhiệm"
