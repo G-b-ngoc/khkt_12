@@ -34,7 +34,7 @@ export function SlideOver({
       <div
         role="dialog"
         aria-modal
-        className="relative z-10 w-full max-w-md rounded-t-2xl border border-border bg-surface p-5 shadow-float animate-[sheet-in_0.2s_ease-out] sm:rounded-2xl"
+        className="scroll-touch relative z-10 max-h-[88vh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-border bg-surface p-5 shadow-float animate-[sheet-in_0.2s_ease-out] sm:rounded-2xl"
       >
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-base font-semibold text-text">{title}</h3>

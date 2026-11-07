@@ -308,7 +308,7 @@ export default function AdminOverviewPage() {
           {history === null && <p className="text-sm text-text-muted">Đang tải...</p>}
           {history !== null && history.length === 0 && <p className="text-sm text-text-muted">Chưa có điều chỉnh nào cho lớp này.</p>}
           {history !== null && history.length > 0 && (
-            <div className="max-h-80 overflow-auto">
+            <div className="scroll-touch max-h-80 overflow-auto">
               <table className="w-full min-w-[760px] text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-text-muted">
@@ -354,7 +354,7 @@ export default function AdminOverviewPage() {
         )}
 
         {!error && filtered.length > 0 && (
-          <div className="max-h-[65vh] overflow-auto rounded-lg border border-border">
+          <div className="scroll-touch max-h-[65vh] overflow-auto rounded-lg border border-border">
             <table className="w-full min-w-[920px] border-collapse text-sm">
               <thead className="sticky top-0 z-10 bg-surface-muted text-xs uppercase tracking-wide text-text-muted">
                 <tr>

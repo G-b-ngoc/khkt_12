@@ -307,7 +307,7 @@ export default function AdminImportStudentsPage() {
             />
           </div>
 
-          <div className="max-h-96 overflow-auto rounded-lg border border-border">
+          <div className="scroll-touch max-h-96 overflow-auto rounded-lg border border-border">
             <table className="w-full min-w-[640px] border-collapse text-sm">
               <thead className="sticky top-0 bg-surface-muted text-xs uppercase text-text-muted">
                 <tr>
@@ -375,7 +375,7 @@ export default function AdminImportStudentsPage() {
           <p className="text-sm text-text-muted">Chưa có lần nhập nào cho lớp này.</p>
         )}
         {history !== null && history.length > 0 && (
-          <div className="overflow-x-auto">
+          <div className="scroll-touch overflow-x-auto">
             <table className="w-full min-w-[640px] text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-text-muted">

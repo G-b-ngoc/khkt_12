@@ -107,7 +107,7 @@ export default function AdminStudentsPage() {
       {error && <p className="text-sm text-danger">{error}</p>}
       {!error && students === null && <p className="text-sm text-text-muted">Đang tải...</p>}
 
-      <Card className="overflow-x-auto p-0">
+      <Card className="scroll-touch overflow-x-auto p-0">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border text-left text-text-muted">

@@ -220,7 +220,7 @@ export default function TeacherOverviewPage() {
         )}
 
         {!error && filtered.length > 0 && (
-          <div className="mt-4 max-h-[60vh] overflow-auto rounded-lg border border-border">
+          <div className="scroll-touch mt-4 max-h-[60vh] overflow-auto rounded-lg border border-border">
             <table className="w-full min-w-[860px] border-collapse text-sm">
               <thead className="sticky top-0 z-10 bg-surface-muted text-xs uppercase tracking-wide text-text-muted">
                 <tr>

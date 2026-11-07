@@ -48,6 +48,53 @@ body {
 
 * {
   -webkit-tap-highlight-color: transparent;
+  /* Bỏ độ trễ 300ms double-tap-to-zoom trên mobile, vẫn cho phép pinch-zoom. */
+  touch-action: manipulation;
+}
+
+/* Cuộn có đà (momentum) mượt trên Safari iOS cho các khung bảng/dải cuộn ngang. */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 640px) {
+  /* Input/select/textarea nhỏ hơn 16px khiến Safari iOS tự zoom trang khi chạm vào ô nhập. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Vòng cầu vồng 7 sắc quanh logo, xoay liên tục (tự tắt khi prefers-reduced-motion ở dưới). */
+.logo-rainbow-ring {
+  background: conic-gradient(
+    from 0deg,
+    #ef4444,
+    #f97316,
+    #eab308,
+    #22c55e,
+    #3b82f6,
+    #6366f1,
+    #a855f7,
+    #ef4444
+  );
+  animation: logo-ring-spin 6s linear infinite;
+}
+
+/* Lớp ánh sáng phản chiếu mô phỏng mặt kính bóng trên logo — hiển thị như nhau ở mọi kích thước. */
+.logo-gloss {
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 45%);
+  mix-blend-mode: overlay;
+}
+
+@keyframes logo-ring-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Tôn trọng prefers-reduced-motion cho MỌI hiệu ứng hover/transition thêm ở Phase 9,

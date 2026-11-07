@@ -31,7 +31,7 @@ export function PillBottomNav({
     >
       <div
         className={clsx(
-          "flex w-full max-w-lg items-stretch gap-1 overflow-x-auto rounded-[var(--radius-pill)] border border-border bg-surface/95 p-1.5 shadow-float backdrop-blur",
+          "scroll-touch flex w-full max-w-lg items-stretch gap-1 overflow-x-auto rounded-[var(--radius-pill)] border border-border bg-surface/95 p-1.5 shadow-float backdrop-blur",
           items.length <= 5 && "justify-center"
         )}
       >

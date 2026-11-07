@@ -129,7 +129,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
 
       <Card className="p-5">
         <h3 className="mb-2 text-sm font-semibold text-text">Dữ liệu tổng hợp (tự động, không chỉnh sửa)</h3>
-        <pre className="max-h-64 overflow-auto rounded-lg bg-surface-muted p-3 text-xs text-text-muted">
+        <pre className="scroll-touch max-h-64 overflow-auto rounded-lg bg-surface-muted p-3 text-xs text-text-muted">
           {JSON.stringify({ ...data.content, summary: undefined }, null, 2)}
         </pre>
       </Card>
