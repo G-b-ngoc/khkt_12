@@ -16,9 +16,9 @@ export function useToast() {
 }
 
 const KIND_STYLE: Record<ToastKind, string> = {
-  success: "border-success/30 bg-white text-text before:bg-success",
-  error: "border-danger/30 bg-white text-text before:bg-danger",
-  info: "border-border bg-white text-text before:bg-accent",
+  success: "border-success/30 bg-surface text-text before:bg-success",
+  error: "border-danger/30 bg-surface text-text before:bg-danger",
+  info: "border-border bg-surface text-text before:bg-accent",
 };
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {

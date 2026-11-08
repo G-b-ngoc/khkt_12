@@ -25,13 +25,13 @@ export const EFFECTIVE_STATUS_LABEL: Record<EffectiveStatusCode, string> = {
 
 export const EFFECTIVE_STATUS_CODES: EffectiveStatusCode[] = [...EFFECTIVE_STATUS_CODES_TUPLE];
 
-export type StatusTone = "neutral" | "success" | "warning" | "danger";
+export type StatusTone = "neutral" | "accent" | "success" | "warning" | "danger" | "violet";
 
 export const EFFECTIVE_STATUS_TONE: Record<EffectiveStatusCode, StatusTone> = {
   NOT_RECORDED: "neutral",
-  CHECKED_IN: "success",
+  CHECKED_IN: "accent", // đang được nhà trường giữ — tách màu với "Đã trả"
   CHECKED_OUT: "success",
   ABSENT: "danger",
-  EXEMPTED: "neutral",
+  EXEMPTED: "violet",
   NEEDS_VERIFICATION: "warning",
 };

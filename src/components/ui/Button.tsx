@@ -3,14 +3,15 @@
 import clsx from "clsx";
 import { ButtonHTMLAttributes } from "react";
 
-type Variant = "primary" | "secondary" | "danger" | "ghost";
+type Variant = "primary" | "secondary" | "soft" | "danger" | "ghost";
 type Size = "md" | "lg";
 
 const VARIANT_CLASS: Record<Variant, string> = {
   primary:
     "bg-accent text-accent-foreground shadow-sm hover:bg-accent-hover hover:shadow-card disabled:bg-accent/40 disabled:shadow-none",
   secondary:
-    "bg-surface-muted text-text border border-border hover:border-accent/30 hover:bg-accent/5 disabled:opacity-50",
+    "bg-surface text-text border border-border hover:border-accent/40 hover:bg-accent-soft/60 disabled:opacity-50",
+  soft: "bg-accent-soft text-accent-ink hover:bg-accent-soft/70 disabled:opacity-50",
   danger: "bg-danger text-white hover:bg-danger/90 disabled:bg-danger/40",
   ghost: "bg-transparent text-text hover:bg-surface-muted disabled:opacity-40",
 };

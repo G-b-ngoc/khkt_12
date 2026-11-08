@@ -4,10 +4,10 @@ import { MacTitleBar } from "@/components/ui/MacTitleBar";
 import { PillBottomNav, type NavItem } from "@/components/nav/PillBottomNav";
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/manager/checkin", label: "Cất điện thoại", icon: "phoneIn" },
-  { href: "/manager/checkout", label: "Trả điện thoại", icon: "phoneOut" },
+  { href: "/manager/checkin", label: "Cất máy", icon: "phoneIn" },
+  { href: "/manager/checkout", label: "Trả máy", icon: "phoneOut" },
   { href: "/manager/report", label: "Báo cáo", icon: "report" },
-  { href: "/manager/account", label: "Tài khoản lớp", icon: "account" },
+  { href: "/manager/account", label: "Tài khoản", icon: "account" },
 ];
 
 export default async function ManagerLayout({ children }: { children: React.ReactNode }) {

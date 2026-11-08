@@ -26,7 +26,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         footer={<LogoutButton />}
       />
       <div className="flex min-h-screen flex-1 flex-col">
-        <MacTitleBar title="Quản trị hệ thống" subtitle="Toàn trường" titleHref="/admin" />
+        <MacTitleBar hideLogoOnDesktop title="Quản trị hệ thống" subtitle="Toàn trường" titleHref="/admin" />
         <main className="flex-1 px-4 pb-28 pt-5 md:pb-8">{children}</main>
         <div className="md:hidden">
           <PillBottomNav items={NAV_ITEMS} />

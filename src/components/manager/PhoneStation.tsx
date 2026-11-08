@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Card, StatusPill } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
+import { SearchIcon } from "@/components/ui/Icons";
 
 type Lookup = {
   studentCode: string;
@@ -84,7 +85,7 @@ export function PhoneStation({
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5">
-      <div className="flex items-center justify-center gap-2 text-2xl font-semibold text-text">
+      <div className="flex items-center justify-center gap-2 text-2xl font-bold tracking-tight text-text">
         {icon}
         {title}
       </div>
@@ -94,6 +95,7 @@ export function PhoneStation({
           Mã học sinh
         </label>
         <div className="flex gap-2">
+          {/* min-w-0: cho phép ô nhập co lại, tránh đẩy nút Tra cứu tràn ra ngoài thẻ trên màn hình hẹp. */}
           <input
             id="student-code"
             ref={inputRef}
@@ -103,13 +105,24 @@ export function PhoneStation({
               if (e.key === "Enter") lookup();
             }}
             autoFocus
-            placeholder="Nhập mã rồi nhấn Enter"
-            className="flex-1 rounded-xl border border-border bg-surface px-4 py-3.5 text-lg outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+            autoComplete="off"
+            autoCapitalize="characters"
+            spellCheck={false}
+            placeholder="Nhập mã học sinh"
+            className="tabular min-w-0 flex-1 rounded-xl border-[1.5px] border-border bg-surface px-4 py-3 text-lg font-semibold tracking-wide text-text outline-none placeholder:font-sans placeholder:font-normal placeholder:tracking-normal placeholder:text-text-muted focus:border-accent focus:ring-4 focus:ring-accent-soft"
           />
-          <Button size="lg" variant="secondary" onClick={lookup} loading={looking}>
-            Tra cứu
+          <Button
+            variant="soft"
+            onClick={lookup}
+            loading={looking}
+            aria-label="Tra cứu"
+            className="shrink-0 px-4"
+          >
+            {!looking && <SearchIcon className="h-5 w-5" />}
+            <span className="hidden sm:inline">Tra cứu</span>
           </Button>
         </div>
+        <p className="mt-2 text-xs text-text-muted">Nhấn Enter hoặc nút kính lúp để tra cứu.</p>
         {error && (
           <p role="alert" className="mt-2 text-sm text-danger">
             {error}
@@ -123,16 +136,16 @@ export function PhoneStation({
             <div>
               <p className="text-lg font-semibold text-text">{student.fullName}</p>
               <p className="text-sm text-text-muted">
-                Mã: {student.studentCode} · Lớp {student.classCode}
+                <span className="tabular">{student.studentCode}</span> · Lớp {student.classCode}
               </p>
             </div>
-            <StatusPill tone={student.status === "IN" ? "success" : "neutral"}>
+            <StatusPill tone={student.status === "IN" ? "accent" : "neutral"}>
               {student.statusLabel}
             </StatusPill>
           </div>
 
           {student.status !== expectedStatus && (
-            <p className="mt-3 rounded-lg bg-warning/10 px-3 py-2 text-sm text-warning">
+            <p className="mt-3 rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning">
               Không thể {actionLabel.toLowerCase()}: trạng thái hiện tại không phù hợp.
             </p>
           )}

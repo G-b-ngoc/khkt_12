@@ -117,44 +117,10 @@ export default function TeacherOverviewPage() {
         </div>
       </div>
 
-      <Card className="flex flex-wrap items-end gap-3 p-3">
-        <div>
-          <label htmlFor="export-scope" className="mb-1 block text-xs text-text-muted">Phạm vi xuất</label>
-          <select
-            id="export-scope"
-            value={effectiveExportScope}
-            onChange={(e) => setExportScope(e.target.value as "all" | "filtered")}
-            className="rounded-lg border border-border bg-surface px-2.5 py-1.5 text-sm outline-none focus:border-accent"
-          >
-            <option value="all">Toàn bộ danh sách lớp ({rows?.length ?? 0})</option>
-            <option value="filtered" disabled={!hasActiveFilter}>
-              Chỉ kết quả đang tìm/lọc {hasActiveFilter ? `(${filtered.length})` : ""}
-            </option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="export-format" className="mb-1 block text-xs text-text-muted">Định dạng</label>
-          <select
-            id="export-format"
-            value={exportFormat}
-            onChange={(e) => setExportFormat(e.target.value as "xlsx" | "csv")}
-            className="rounded-lg border border-border bg-surface px-2.5 py-1.5 text-sm outline-none focus:border-accent"
-          >
-            <option value="xlsx">Excel (.xlsx)</option>
-            <option value="csv">CSV</option>
-          </select>
-        </div>
-        <a href={exportUrl}>
-          <Button variant="secondary" size="md">⬇ Tải xuống báo cáo</Button>
-        </a>
-        <p className="w-full text-xs text-text-muted">
-          File chỉ gồm học sinh lớp bạn được phân công, đúng ngày {date} đang xem ở trên.
-        </p>
-      </Card>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3">
         <StatCard label="Tổng học sinh" value={stats.total} />
-        <StatCard label="Đã cất" value={stats.checkedIn} tone="success" />
+        <StatCard label="Đã cất" value={stats.checkedIn} tone="accent" />
         <StatCard label="Đã trả" value={stats.checkedOut} tone="success" />
         <StatCard label="Chưa ghi nhận cất" value={stats.missing} />
         <StatCard label="Cần xác minh" value={stats.needsVerify} tone="warning" />
@@ -238,7 +204,7 @@ export default function TeacherOverviewPage() {
                 {filtered.map((r, idx) => (
                   <tr key={r.id} className="border-b border-border last:border-b-0 hover:bg-surface-muted/60">
                     <td className="px-3 py-2 text-text-muted">{idx + 1}</td>
-                    <td className="px-3 py-2 font-medium text-text">{r.studentCode}</td>
+                    <td className="tabular px-3 py-2 font-medium text-text">{r.studentCode}</td>
                     <td className="px-3 py-2">
                       <Link href={`/teacher/students/${r.id}`} className="text-text hover:text-accent">
                         {r.fullName}
@@ -250,12 +216,12 @@ export default function TeacherOverviewPage() {
                           {EFFECTIVE_STATUS_LABEL[r.adjustment.newStatus]}
                         </StatusPill>
                       ) : (
-                        <StatusPill tone={r.checkInStatus === "Đã cất" ? "success" : "neutral"}>
+                        <StatusPill tone={r.checkInStatus === "Đã cất" ? "accent" : "neutral"}>
                           {r.checkInStatus}
                         </StatusPill>
                       )}
                     </td>
-                    <td className="px-3 py-2 text-text-muted">{formatTimeInAppTimezone(r.checkInAt)}</td>
+                    <td className="tabular px-3 py-2 text-text-muted">{formatTimeInAppTimezone(r.checkInAt)}</td>
                     <td className="px-3 py-2">
                       {r.adjustment ? (
                         <StatusPill tone={EFFECTIVE_STATUS_TONE[r.adjustment.newStatus]}>
@@ -275,7 +241,7 @@ export default function TeacherOverviewPage() {
                         </StatusPill>
                       )}
                     </td>
-                    <td className="px-3 py-2 text-text-muted">{formatTimeInAppTimezone(r.checkOutAt)}</td>
+                    <td className="tabular px-3 py-2 text-text-muted">{formatTimeInAppTimezone(r.checkOutAt)}</td>
                     <td className="px-3 py-2 text-text-muted">
                       {r.adjustment ? `Cấp 3 điều chỉnh (${r.adjustment.adjustedByName}): ${r.adjustment.reason}` : r.note ?? "—"}
                     </td>
@@ -285,6 +251,43 @@ export default function TeacherOverviewPage() {
             </table>
           </div>
         )}
+      </Card>
+
+      {/* Khối tải báo cáo đặt sau bảng: trên điện thoại, thống kê + bảng hiện ngay đầu trang. */}
+      <Card className="flex flex-wrap items-end gap-3 p-4">
+        <h2 className="w-full text-sm font-semibold text-text">Tải báo cáo ngày này</h2>
+        <div>
+          <label htmlFor="export-scope" className="mb-1 block text-xs text-text-muted">Phạm vi xuất</label>
+          <select
+            id="export-scope"
+            value={effectiveExportScope}
+            onChange={(e) => setExportScope(e.target.value as "all" | "filtered")}
+            className="rounded-lg border border-border bg-surface px-2.5 py-1.5 text-sm outline-none focus:border-accent"
+          >
+            <option value="all">Toàn bộ danh sách lớp ({rows?.length ?? 0})</option>
+            <option value="filtered" disabled={!hasActiveFilter}>
+              Chỉ kết quả đang tìm/lọc {hasActiveFilter ? `(${filtered.length})` : ""}
+            </option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="export-format" className="mb-1 block text-xs text-text-muted">Định dạng</label>
+          <select
+            id="export-format"
+            value={exportFormat}
+            onChange={(e) => setExportFormat(e.target.value as "xlsx" | "csv")}
+            className="rounded-lg border border-border bg-surface px-2.5 py-1.5 text-sm outline-none focus:border-accent"
+          >
+            <option value="xlsx">Excel (.xlsx)</option>
+            <option value="csv">CSV</option>
+          </select>
+        </div>
+        <a href={exportUrl}>
+          <Button variant="primary" size="md">Tải xuống báo cáo</Button>
+        </a>
+        <p className="w-full text-xs text-text-muted">
+          File chỉ gồm học sinh lớp bạn được phân công, đúng ngày {date} đang chọn ở đầu trang.
+        </p>
       </Card>
     </div>
   );

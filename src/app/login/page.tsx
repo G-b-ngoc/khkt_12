@@ -48,10 +48,9 @@ export default function LoginPage() {
     <main className="relative flex min-h-screen flex-1 items-center justify-center overflow-hidden bg-bg px-4 py-10">
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[-10%] h-72 w-72 -translate-x-1/2 rounded-full opacity-30 blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-[-12%] h-80 w-80 -translate-x-1/2 rounded-full opacity-25 blur-3xl"
         style={{
-          background:
-            "radial-gradient(circle, var(--brand-ring-from), var(--brand-ring-via) 55%, transparent 75%)",
+          background: "radial-gradient(circle, var(--accent), var(--rail) 55%, transparent 75%)",
         }}
       />
       <div className="w-full max-w-sm">

@@ -18,7 +18,12 @@ export function Card({
   );
 }
 
-/** Thẻ thống kê dùng chung (dashboard, Theo dõi Cấp 2/Cấp 3) — nâng nhẹ + đổ bóng mềm khi hover. */
+export type PillTone = "neutral" | "accent" | "success" | "warning" | "danger" | "violet";
+
+/**
+ * Thẻ thống kê dùng chung (dashboard, Theo dõi Cấp 2/Cấp 3). Gọn trên điện thoại (p-3, chữ
+ * nhỏ hơn) để 5-7 thẻ không chiếm hết màn hình trước khi tới bảng dữ liệu.
+ */
 export function StatCard({
   label,
   value,
@@ -26,51 +31,49 @@ export function StatCard({
 }: {
   label: string;
   value: number;
-  tone?: "success" | "warning" | "danger";
+  tone?: Exclude<PillTone, "neutral">;
 }) {
-  const toneClass =
-    tone === "success"
-      ? "text-success"
-      : tone === "warning"
-        ? "text-warning"
-        : tone === "danger"
-          ? "text-danger"
-          : "text-text";
+  const toneClass: Record<Exclude<PillTone, "neutral">, string> = {
+    accent: "text-accent",
+    success: "text-success",
+    warning: "text-warning",
+    danger: "text-danger",
+    violet: "text-violet",
+  };
   return (
-    <Card className="p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-float">
-      <p className="text-xs text-text-muted">{label}</p>
-      <p className={clsx("text-2xl font-semibold", toneClass)}>{value}</p>
+    <Card className="p-3 transition-shadow duration-200 hover:shadow-float sm:p-4">
+      <p className="truncate text-xs text-text-muted">{label}</p>
+      <p className={clsx("text-xl font-semibold tabular-nums sm:text-2xl", tone ? toneClass[tone] : "text-text")}>
+        {value}
+      </p>
     </Card>
   );
 }
 
+/** Nhãn trạng thái: nền màu nhạt (*-soft) + chấm tròn cùng màu chữ, đọc rõ ở cả chế độ sáng/tối. */
 export function StatusPill({
   tone,
   children,
 }: {
-  tone: "neutral" | "success" | "warning" | "danger";
+  tone: PillTone;
   children: React.ReactNode;
 }) {
-  const toneClass: Record<typeof tone, string> = {
-    neutral: "bg-surface-muted text-text-muted border-border",
-    success: "bg-success/10 text-success border-success/30",
-    warning: "bg-warning/10 text-warning border-warning/30",
-    danger: "bg-danger/10 text-danger border-danger/30",
-  };
-  const icon: Record<typeof tone, string> = {
-    neutral: "●",
-    success: "✓",
-    warning: "!",
-    danger: "✕",
+  const toneClass: Record<PillTone, string> = {
+    neutral: "bg-surface-muted text-text-muted",
+    accent: "bg-accent-soft text-accent-ink",
+    success: "bg-success-soft text-success",
+    warning: "bg-warning-soft text-warning",
+    danger: "bg-danger-soft text-danger",
+    violet: "bg-violet-soft text-violet",
   };
   return (
     <span
       className={clsx(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full py-1 pl-2 pr-2.5 text-xs font-semibold",
         toneClass[tone]
       )}
     >
-      <span aria-hidden>{icon[tone]}</span>
+      <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-current" />
       {children}
     </span>
   );

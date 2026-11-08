@@ -294,12 +294,12 @@ export default function AdminOverviewPage() {
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
         <StatCard label="Tổng học sinh" value={stats.total} />
-        <StatCard label="Đã cất" value={stats.checkedIn} tone="success" />
+        <StatCard label="Đã cất" value={stats.checkedIn} tone="accent" />
         <StatCard label="Đã trả" value={stats.checkedOut} tone="success" />
         <StatCard label="Chưa ghi nhận cất" value={stats.notRecorded} />
         <StatCard label="Cần xác minh" value={stats.needsVerify} tone="warning" />
-        <StatCard label="Vắng mặt" value={stats.absent} tone="warning" />
-        <StatCard label="Được miễn" value={stats.exempted} />
+        <StatCard label="Vắng mặt" value={stats.absent} tone="danger" />
+        <StatCard label="Được miễn" value={stats.exempted} tone="violet" />
       </div>
 
       {showHistory && (
@@ -373,12 +373,12 @@ export default function AdminOverviewPage() {
                 {filtered.map((r, idx) => (
                   <tr key={r.id} className="border-b border-border last:border-b-0 hover:bg-surface-muted/60">
                     <td className="px-3 py-2 text-text-muted">{idx + 1}</td>
-                    <td className="px-3 py-2 font-medium text-text">{r.studentCode}</td>
+                    <td className="tabular px-3 py-2 font-medium text-text">{r.studentCode}</td>
                     <td className="px-3 py-2">{r.fullName}</td>
                     <td className="px-3 py-2">
-                      <StatusPill tone={r.checkInStatus === "Đã cất" ? "success" : "neutral"}>{r.checkInStatus}</StatusPill>
+                      <StatusPill tone={r.checkInStatus === "Đã cất" ? "accent" : "neutral"}>{r.checkInStatus}</StatusPill>
                     </td>
-                    <td className="px-3 py-2 text-text-muted">{formatTimeInAppTimezone(r.checkInAt)}</td>
+                    <td className="tabular px-3 py-2 text-text-muted">{formatTimeInAppTimezone(r.checkInAt)}</td>
                     <td className="px-3 py-2">
                       <StatusPill
                         tone={r.checkOutStatus === "Đã trả" ? "success" : r.checkOutStatus === "Cần xác minh" ? "warning" : "neutral"}
@@ -386,7 +386,7 @@ export default function AdminOverviewPage() {
                         {r.checkOutStatus}
                       </StatusPill>
                     </td>
-                    <td className="px-3 py-2 text-text-muted">{formatTimeInAppTimezone(r.checkOutAt)}</td>
+                    <td className="tabular px-3 py-2 text-text-muted">{formatTimeInAppTimezone(r.checkOutAt)}</td>
                     <td className="px-3 py-2 text-xs text-text-muted">
                       {r.adjustment ? (
                         <span>

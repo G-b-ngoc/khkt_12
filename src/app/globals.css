@@ -1,27 +1,68 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #faf7f7;
+  /* Theme "Mực xanh": màu nhấn lấy từ logo (xanh mực + xanh lam). Màu đậm chỉ dùng cho thanh
+     điều hướng (--rail), vùng nội dung giữ sáng để đọc bảng. */
+  --bg: #f3f5f9;
   --surface: #ffffff;
-  --surface-muted: #f6f1f1;
-  --border: #ece3e3;
-  --text: #201618;
-  --text-muted: #726566;
-  /* Đỏ chủ đạo: đỏ rượu vang hiện đại, có chiều sâu — dùng cho thương hiệu + hành động chính. */
-  --accent: #a3122f;
-  --accent-hover: #8a0f28;
+  --surface-muted: #edf1f7;
+  --border: #dbe2ec;
+  --text: #0f1b33;
+  --text-muted: #56637c;
+  --accent: #2350a0;
+  --accent-hover: #1b3f80;
   --accent-foreground: #ffffff;
-  /* Đỏ cam sáng hơn accent — chỉ dùng cho lỗi/cảnh báo nguy hiểm, không dùng làm màu nhận diện. */
-  --danger: #e5484d;
-  --warning: #e8960c;
-  --success: #15916b;
-  --brand-ring-from: #ff8a65;
-  --brand-ring-via: #a3122f;
-  --brand-ring-to: #3a0a16;
+  --accent-soft: #e5edfa;
+  --accent-ink: #1b3f80;
+  /* Thanh điều hướng (sidebar, đầu trạm Cấp 1) */
+  --rail: #13234a;
+  --rail-fg: #e9eefb;
+  --rail-muted: #9eabc9;
+  --rail-active: rgba(255, 255, 255, 0.12);
+  /* Màu ngữ nghĩa — tách biệt hẳn với màu nhấn để nút chính không bị nhầm với cảnh báo. */
+  --success: #12825c;
+  --success-soft: #e2f4ec;
+  --warning: #a96300;
+  --warning-soft: #fdf1dc;
+  --danger: #c4313a;
+  --danger-soft: #fbe7e8;
+  --violet: #6247c0;
+  --violet-soft: #eeeafb;
   --radius-card: 14px;
   --radius-pill: 999px;
-  --shadow-card: 0 1px 2px rgba(32, 10, 16, 0.04), 0 8px 24px rgba(32, 10, 16, 0.07);
-  --shadow-float: 0 12px 32px rgba(32, 10, 16, 0.16);
+  --shadow-card: 0 1px 2px rgba(15, 27, 51, 0.05), 0 6px 20px rgba(15, 27, 51, 0.06);
+  --shadow-float: 0 14px 36px rgba(15, 27, 51, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1120;
+    --surface: #131b2e;
+    --surface-muted: #1a2440;
+    --border: #26324f;
+    --text: #e6ebf5;
+    --text-muted: #94a1bc;
+    --accent: #80a7ee;
+    --accent-hover: #9cbbf2;
+    --accent-foreground: #0b1120;
+    --accent-soft: #1b2a4b;
+    --accent-ink: #a9c3f4;
+    --rail: #080d1a;
+    --rail-fg: #e6ebf5;
+    --rail-muted: #8391af;
+    --rail-active: rgba(128, 167, 238, 0.16);
+    --success: #44c194;
+    --success-soft: #12322a;
+    --warning: #e9ac43;
+    --warning-soft: #362a12;
+    --danger: #f06a71;
+    --danger-soft: #3a1a1e;
+    --violet: #ab98f0;
+    --violet-soft: #272046;
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-float: 0 14px 36px rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
 }
 
 @theme inline {
@@ -34,16 +75,28 @@
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-foreground: var(--accent-foreground);
-  --color-danger: var(--danger);
-  --color-warning: var(--warning);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-rail: var(--rail);
+  --color-rail-fg: var(--rail-fg);
+  --color-rail-muted: var(--rail-muted);
+  --color-rail-active: var(--rail-active);
   --color-success: var(--success);
-  --font-sans: var(--font-inter);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-violet: var(--violet);
+  --color-violet-soft: var(--violet-soft);
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-mono-face);
 }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-inter), "Segoe UI", system-ui, sans-serif;
+  font-family: var(--font-ui), "Segoe UI", system-ui, sans-serif;
 }
 
 * {
@@ -67,27 +120,10 @@ body {
   }
 }
 
-/* Vòng cầu vồng 7 sắc quanh logo — đứng im, không xoay. */
-.logo-rainbow-ring {
-  background: conic-gradient(
-    from 0deg,
-    #ef4444,
-    #f97316,
-    #eab308,
-    #22c55e,
-    #3b82f6,
-    #6366f1,
-    #a855f7,
-    #ef4444
-  );
-}
-
-/* Lớp ánh sáng phản chiếu mô phỏng mặt kính bóng trên logo — hiển thị như nhau ở mọi kích thước. */
-.logo-gloss {
-  background:
-    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 55%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 45%);
-  mix-blend-mode: overlay;
+/* Mã học sinh, giờ, số liệu: phông mono + chữ số đều nhau để các cột thẳng hàng. */
+.tabular {
+  font-family: var(--font-mono-face), ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Tôn trọng prefers-reduced-motion cho MỌI hiệu ứng hover/transition thêm ở Phase 9,

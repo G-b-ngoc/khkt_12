@@ -5,7 +5,16 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { ICONS } from "@/components/ui/Icons";
 import { LogoWithWordmark } from "@/components/ui/Logo";
-import type { NavItem } from "./PillBottomNav";
+import { getActiveHref, type NavItem } from "./PillBottomNav";
+
+/** Chữ cái đầu của từ đầu + từ cuối trong họ tên (vd. "Lê Thu Hà" -> "LH"), dùng cho ô avatar. */
+function initials(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "?";
+  const first = words[0][0] ?? "";
+  const last = words.length > 1 ? (words[words.length - 1][0] ?? "") : "";
+  return (first + last).toUpperCase();
+}
 
 export function Sidebar({
   items,
@@ -21,57 +30,58 @@ export function Sidebar({
   footer?: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const activeHref = getActiveHref(pathname, items);
 
   return (
-    <aside className="hidden w-64 flex-col border-r border-border bg-surface md:flex">
-      <div className="border-b border-border px-4 py-4">
-        <LogoWithWordmark size="sm" />
+    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-rail text-rail-fg md:flex">
+      <div className="px-4 pb-3 pt-5">
+        <LogoWithWordmark size="sm" onDark />
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 p-3">
+      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3" aria-label="Điều hướng chính">
         {items.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(item.href + "/");
+          const active = item.href === activeHref;
           const isHighlight = item.href === highlightHref;
           const Icon = ICONS[item.icon];
           return (
             <Link
               key={item.href}
               href={item.href}
+              aria-current={active ? "page" : undefined}
               className={clsx(
-                "group relative flex items-center gap-3 rounded-lg py-2.5 pl-4 pr-3 text-sm font-medium transition-all duration-150",
+                "group flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-sm transition-colors duration-150",
                 active
-                  ? "bg-accent/10 text-accent"
-                  : isHighlight
-                    ? "bg-warning/10 text-warning hover:bg-warning/15"
-                    : "text-text-muted hover:translate-x-0.5 hover:bg-surface-muted hover:text-text"
+                  ? "bg-rail-active font-semibold text-rail-fg"
+                  : "font-medium text-rail-muted hover:bg-white/5 hover:text-rail-fg"
               )}
             >
-              <span
-                className={clsx(
-                  "absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-full bg-accent transition-opacity duration-150",
-                  active ? "opacity-100" : "opacity-0"
-                )}
-                aria-hidden
-              />
               <Icon
                 className={clsx(
                   "h-[18px] w-[18px] shrink-0 transition-transform duration-150",
                   !active && "group-hover:scale-110"
                 )}
               />
-              <span className="truncate">{item.label}</span>
+              <span className="flex-1 truncate">{item.label}</span>
+              {isHighlight && (
+                <span className="h-2 w-2 shrink-0 rounded-full bg-warning" aria-label="Mục quan trọng" />
+              )}
             </Link>
           );
         })}
       </nav>
 
       {user && (
-        <div className="border-t border-border px-4 py-3">
-          <p className="truncate text-sm font-medium text-text">{user.name}</p>
-          <p className="truncate text-xs text-text-muted">{user.roleLabel}</p>
+        <div className="mx-3 mb-2 flex items-center gap-3 rounded-xl bg-white/5 px-3 py-2.5">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
+            {initials(user.name)}
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-semibold text-rail-fg">{user.name}</span>
+            <span className="block truncate text-[11px] text-rail-muted">{user.roleLabel}</span>
+          </span>
         </div>
       )}
-      {footer && <div className="border-t border-border p-3">{footer}</div>}
+      {footer && <div className="border-t border-white/10 p-3">{footer}</div>}
     </aside>
   );
 }

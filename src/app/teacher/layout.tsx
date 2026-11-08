@@ -27,6 +27,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
       />
       <div className="flex min-h-screen flex-1 flex-col">
         <MacTitleBar
+          hideLogoOnDesktop
           title="Giáo viên chủ nhiệm"
           subtitle={`Lớp ${classLabel}`}
           titleHref="/teacher"

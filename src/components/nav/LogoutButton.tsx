@@ -22,7 +22,8 @@ export function LogoutButton({ className }: { className?: string }) {
       disabled={loading}
       className={
         className ??
-        "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-text-muted hover:bg-surface-muted hover:text-danger disabled:opacity-50"
+        // Mặc định dùng trong footer sidebar (nền --rail đậm); trang tài khoản truyền className riêng.
+        "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-rail-muted transition-colors hover:bg-white/5 hover:text-rail-fg disabled:opacity-50"
       }
     >
       <LogoutIcon className="h-4 w-4" />
