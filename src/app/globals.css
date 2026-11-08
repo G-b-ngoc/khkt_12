@@ -67,7 +67,7 @@ body {
   }
 }
 
-/* Vòng cầu vồng 7 sắc quanh logo, xoay liên tục (tự tắt khi prefers-reduced-motion ở dưới). */
+/* Vòng cầu vồng 7 sắc quanh logo — đứng im, không xoay. */
 .logo-rainbow-ring {
   background: conic-gradient(
     from 0deg,
@@ -80,7 +80,6 @@ body {
     #a855f7,
     #ef4444
   );
-  animation: logo-ring-spin 6s linear infinite;
 }
 
 /* Lớp ánh sáng phản chiếu mô phỏng mặt kính bóng trên logo — hiển thị như nhau ở mọi kích thước. */
@@ -89,12 +88,6 @@ body {
     radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 55%),
     linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 45%);
   mix-blend-mode: overlay;
-}
-
-@keyframes logo-ring-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 /* Tôn trọng prefers-reduced-motion cho MỌI hiệu ứng hover/transition thêm ở Phase 9,

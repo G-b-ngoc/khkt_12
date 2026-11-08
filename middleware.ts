@@ -28,5 +28,11 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Loại trừ file tĩnh trong /public (ảnh, icon...) khỏi lớp chặn session: next/image tự
+  // fetch nội bộ các ảnh này, và không có cookie trong request đó -> nếu không loại trừ,
+  // middleware sẽ redirect request ảnh về /login, khiến ảnh không hiển thị khi chưa đăng nhập
+  // (ví dụ: logo trên chính trang đăng nhập).
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico)$).*)",
+  ],
 };

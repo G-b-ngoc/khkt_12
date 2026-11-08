@@ -10,7 +10,7 @@ const SIZE_PX = {
 /**
  * Biểu tượng thương hiệu THB Phone Manager dùng chung toàn hệ thống (title bar, sidebar,
  * trang đăng nhập) — logo do người dùng cung cấp (`public/logo.png`, đã tách nền trong suốt).
- * Vòng ngoài là dải cầu vồng 7 sắc xoay liên tục, lớp trong có ánh bóng mô phỏng mặt kính —
+ * Vòng ngoài là dải cầu vồng 7 sắc đứng im, lớp trong có ánh bóng mô phỏng mặt kính —
  * cùng 1 component nên mobile (title bar/login) và desktop (sidebar) hiển thị giống nhau.
  */
 export function Logo({
