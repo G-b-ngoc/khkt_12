@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUser, requireRole, getAssignedClassIds, authErrorResponse } from "@/lib/auth/guard";
-import { getClassesDayOverview, EFFECTIVE_STATUS_LABEL, type OverviewRow } from "@/lib/overview";
+import {
+  getClassesDayOverview,
+  EFFECTIVE_STATUS_LABEL,
+  type EffectiveStatusCode,
+  type OverviewRow,
+} from "@/lib/overview";
 import { isValidDateStr, todayInAppTimezone, formatTimeInAppTimezone } from "@/lib/timezone";
 import { matchesSearchQuery } from "@/lib/search";
 import { toCsv, toXlsxBuffer, type ExportColumn } from "@/lib/exportTable";
@@ -15,8 +20,9 @@ function displayStatus(r: OverviewRow, column: "in" | "out"): string {
   return column === "in" ? r.checkInStatus : r.checkOutStatus;
 }
 
+/** Nhãn chung — bản điều chỉnh có thể do Cấp 2 (giáo viên của chính lớp) hoặc Cấp 3 tạo. */
 function displayNote(r: OverviewRow): string {
-  if (r.adjustment) return `Cấp 3 điều chỉnh (${r.adjustment.adjustedByName}): ${r.adjustment.reason}`;
+  if (r.adjustment) return `Đã điều chỉnh (${r.adjustment.adjustedByName}): ${r.adjustment.reason}`;
   return r.note ?? "";
 }
 
@@ -66,12 +72,14 @@ export async function GET(req: NextRequest) {
       const q = req.nextUrl.searchParams.get("q") ?? "";
       const checkIn = req.nextUrl.searchParams.get("checkIn") ?? "ALL";
       const checkOut = req.nextUrl.searchParams.get("checkOut") ?? "ALL";
+      const statusFilter = req.nextUrl.searchParams.get("status") as EffectiveStatusCode | null;
       rows = rows.filter((r) => {
         if (checkIn === "DONE" && r.checkInStatus !== "Đã cất") return false;
         if (checkIn === "MISSING" && r.checkInStatus !== "Chưa ghi nhận cất") return false;
         if (checkOut === "DONE" && r.checkOutStatus !== "Đã trả") return false;
         if (checkOut === "NEEDS_VERIFY" && r.checkOutStatus !== "Cần xác minh") return false;
         if (checkOut === "NA" && r.checkOutStatus !== "Chưa áp dụng") return false;
+        if (statusFilter && r.effectiveStatus !== statusFilter) return false;
         return matchesSearchQuery(`${r.fullName} ${r.studentCode}`, q);
       });
     }
@@ -79,7 +87,7 @@ export async function GET(req: NextRequest) {
     const exportRows: ExportRow[] = rows.map((r, i) => ({ ...r, stt: i + 1 }));
     const columns = buildColumns();
     const classLabel = slugifyClassCodes(classes.map((c) => c.code));
-    const baseName = `Bao_cao_THB_Lop_${classLabel}_${date}`;
+    const baseName = `Bao_cao_TB_Lop_${classLabel}_${date}`;
 
     await writeAuditLog({
       actorId: user.id,

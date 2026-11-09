@@ -1,6 +1,6 @@
-# PROJECT_STATUS — THB Phone Manager
+# PROJECT_STATUS — TB Phone Manager
 
-Cập nhật: 2026-11-06 (Phase 0–9: đủ 3 cấp phân quyền + báo cáo cuối tuần + test tự động + nhập danh sách từ file + Theo dõi toàn trường/điều chỉnh trạng thái + xuất báo cáo Cấp 2 + nâng cấp giao diện toàn hệ thống)
+Cập nhật: 2026-11-09 (Phase 0–10: đủ 3 cấp phân quyền + báo cáo cuối tuần + test tự động + nhập danh sách từ file + Theo dõi toàn trường/điều chỉnh trạng thái (Cấp 3) + xuất báo cáo Cấp 2 + nâng cấp giao diện toàn hệ thống + điều chỉnh trạng thái cho Cấp 2)
 
 ## Đã hoàn thành (có backend thật, đã kiểm thử thật — không phải UI minh họa)
 
@@ -71,6 +71,21 @@ Tạo bản dự thảo theo lớp + toàn trường (phát hiện học sinh kh
 
 **Chưa kiểm tra được bằng HTTP thật trong lần này**: các trang `/admin/*` — mật khẩu admin trong `.env` không khớp với DB Postgres (Neon) đang kết nối ở máy này nên chưa đăng nhập được bằng tài khoản admin thật để curl trực tiếp (chủ động không tạo session/đổi mật khẩu admin để bypass vì đó là thao tác nhạy cảm trên dữ liệu thật). Mức độ tin cậy vẫn cao vì: (1) `Sidebar`/`MacTitleBar` dùng ở `/admin/*` là **cùng component, cùng dạng prop** (`user: {name, roleLabel}`, `items` dạng tên icon chuỗi) đã xác nhận render đúng qua Cấp 2 ở trên — không có nhánh logic riêng cho ADMIN có thể gãy khác; (2) `npx tsc --noEmit` xác nhận đúng kiểu cho toàn bộ trang `/admin/*`. Vẫn nên tự xác nhận bằng mắt trước khi coi là xong, xem mục "Việc cần bạn quyết định".
 - Kiểm tra giao diện responsive bằng mắt ở độ rộng điện thoại thật: môi trường hiện tại không có công cụ trình duyệt/screenshot, giống hạn chế đã ghi nhận từ Phase 6/7/8 — các class Tailwind responsive (`flex-wrap`, `md:flex`, `sm:grid-cols-*`) được giữ/áp dụng nhất quán với pattern cũ nhưng chưa xác nhận bằng ảnh chụp thật.
+
+### Phase 10 — Điều chỉnh trạng thái cất/trả cho Cấp 2 (2026-11-09)
+
+Mở rộng tính năng "điều chỉnh trạng thái" (trước đó chỉ Cấp 3 có, ở Phase 8) cho Cấp 2 — **không tạo bảng/mô hình dữ liệu mới, không có migration**: dùng lại đúng bảng `DayStatusAdjustment` (append-only) + enum `DayStatusCode` đã có sẵn.
+
+- `POST /api/teacher/overview/adjust` (TEACHER-only, `src/app/api/teacher/overview/adjust/route.ts`): giáo viên đặt 1 trong 4 trạng thái **Đã cất/Đã trả/Vắng mặt/Được miễn** cho học sinh lớp mình, bắt buộc lý do. Kiểm tra quyền sở hữu lớp trên MỖI yêu cầu bằng cách suy `classId` từ hồ sơ học sinh thật (không nhận/tin `classId` từ client) rồi so với `getAssignedClassIds(user, "TEACHER")` — chặn giả mạo `studentId` thuộc lớp khác (403 `AuthzError`, không phải lỗi 404 chung như Cấp 1 tra cứu học sinh — ở đây trả 403 vì học sinh có tồn tại thật, chỉ là giáo viên không có quyền). "Đã trả" chỉ được chấp nhận nếu đã có `PhoneTransaction` loại `CHECK_IN` thật trong đúng ngày đó — nếu chưa, trả 400 kèm thông báo rõ, giữ đúng quy tắc "không tự suy diễn giao dịch giả"; Cấp 3 không bị áp quy tắc này (giữ hành vi cũ, có quy trình xử lý riêng cho trường hợp đặc biệt).
+- `GET /api/teacher/overview/adjustments` (TEACHER-only, `src/app/api/teacher/overview/adjustments/route.ts`): lịch sử điều chỉnh, luôn lọc theo lớp được phân công của phiên đăng nhập (không nhận `classId` từ client) — không có API sửa/xoá.
+- Trang `/teacher`: thêm modal điều chỉnh (component mới `src/components/ui/Modal.tsx` — modal căn giữa, khác `SlideOver` trượt cạnh đang dùng ở Cấp 3) mở bằng nút "Điều chỉnh" cuối hàng hoặc bấm trực tiếp vào badge trạng thái; có 2 bước (chọn trạng thái/lý do/ghi chú → xem lại tóm tắt thay đổi → xác nhận); cảnh báo khi trạng thái mới khác trạng thái hiện tại; tuỳ chọn "Đã trả" bị disable kèm giải thích nếu học sinh chưa có giao dịch cất thật trong ngày (chặn trước ở UI, backend vẫn là nơi kiểm tra có hiệu lực). Có nút "Xem lịch sử điều chỉnh" riêng cho Cấp 2.
+- Bộ lọc trạng thái trên `/teacher` đổi từ 2 dropdown cơ học (trạng thái cất/trạng thái trả) sang 1 dropdown theo đúng 6 trạng thái hiệu lực (giống Cấp 3) — 7 ô thống kê (thêm Vắng mặt/Được miễn), tính lại theo đúng bộ lọc đang áp dụng + sau khi điều chỉnh (dùng `effectiveStatus`, không dùng lại trạng thái cơ học cũ).
+- `GET /api/teacher/overview/export` nhận thêm tham số `status` (effectiveStatus) để xuất đúng bộ lọc mới — vẫn tái dùng `getClassesDayOverview`, không thêm logic tính trạng thái; đổi nhãn ghi chú từ "Cấp 3 điều chỉnh" thành "Đã điều chỉnh (tên người thực hiện)" ở cả export Cấp 2 vì giờ người điều chỉnh có thể là Cấp 2 hoặc Cấp 3.
+- Không đổi hành vi/giao diện Cấp 1 (MANAGER vẫn 403 ở 2 API mới) và Cấp 3 (`/admin/overview`, `/api/admin/overview/*` giữ nguyên, không sửa file).
+
+**Đã kiểm tra**: `npx tsc --noEmit` sạch, `npm run lint` sạch. Vitest tích hợp mới (`tests/teacher-overview-adjust.integration.test.ts`) — xem bảng kết quả ở mục dưới.
+
+**Quyết định có chủ đích — màu badge trạng thái**: yêu cầu gốc có đề một bảng màu riêng cho 6 trạng thái (ví dụ "Vắng mặt" = xám, "Đã cất" = xanh lá). Bảng `EFFECTIVE_STATUS_TONE` hiện tại (`src/lib/overviewStatus.ts`, dùng chung Cấp 2 + Cấp 3 từ Phase 8) đã phân biệt đủ 6 trạng thái bằng màu riêng nhưng theo một sơ đồ khác (ví dụ "Vắng mặt" = đỏ/danger để gây chú ý, "Được miễn" = tím, "Cần xác minh" = cam — 3/6 đã khớp yêu cầu gốc). Giữ nguyên sơ đồ màu hiện có cho Phase 10 để không đổi giao diện Cấp 3 ngoài yêu cầu ("không ảnh hưởng Cấp 3") — đổi `EFFECTIVE_STATUS_TONE` sẽ tự động đổi màu badge ở cả `/admin/overview`. Nếu bạn muốn đúng bảng màu đã đề (xanh lá/xanh dương/xám/tím/cam) áp dụng cho toàn hệ thống, đây là việc làm thêm cần xác nhận riêng.
 
 ## Kết quả kiểm thử thực tế
 
