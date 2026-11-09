@@ -1,4 +1,4 @@
-# THB Phone Manager
+# TB Phone Manager
 
 Hệ thống quản lý cất/trả điện thoại học sinh với mô hình phân quyền 3 cấp:
 **Cấp 1 — Quản lý lớp**, **Cấp 2 — Giáo viên chủ nhiệm**, **Cấp 3 — Quản trị viên**.

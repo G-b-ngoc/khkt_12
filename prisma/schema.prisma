@@ -1,4 +1,4 @@
-// THB Phone Manager — Prisma schema
+// TB Phone Manager — Prisma schema
 // Production (Vercel) dùng PostgreSQL — SQLite không dùng được trên serverless vì
 // filesystem không ghi được/không persist giữa các lần gọi function.
 

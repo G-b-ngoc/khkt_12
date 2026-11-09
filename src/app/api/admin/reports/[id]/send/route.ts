@@ -39,7 +39,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const mailer = getMailer();
     const content = JSON.parse(report.contentJson);
-    const subject = `[THB] Báo cáo tuần ${report.weekStart.toLocaleDateString("vi-VN")}`;
+    const subject = `[TB] Báo cáo tuần ${report.weekStart.toLocaleDateString("vi-VN")}`;
     const body = JSON.stringify(content, null, 2);
 
     const results = await Promise.all(recipients.map((to) => mailer.send(to, subject, body)));

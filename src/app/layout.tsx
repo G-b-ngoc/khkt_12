@@ -18,7 +18,7 @@ const monoFont = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "THB Phone Manager",
+  title: "TB Phone Manager",
   description: "Hệ thống quản lý cất/trả điện thoại học sinh",
   icons: {
     icon: "/logo.png",

@@ -58,7 +58,7 @@ export default function LoginPage() {
           <div className="mx-auto mb-3">
             <Logo size="lg" />
           </div>
-          <h1 className="text-xl font-semibold text-text">THB Phone Manager</h1>
+          <h1 className="text-xl font-semibold text-text">TB Phone Manager</h1>
           <p className="mt-1 text-sm text-text-muted">Đăng nhập để tiếp tục</p>
         </div>
 
