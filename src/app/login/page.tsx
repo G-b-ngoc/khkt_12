@@ -48,7 +48,7 @@ export default function LoginPage() {
     <main className="relative flex min-h-screen flex-1 items-center justify-center overflow-hidden bg-bg px-4 py-10">
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[-12%] h-80 w-80 -translate-x-1/2 rounded-full opacity-25 blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-[-12%] h-96 w-96 -translate-x-1/2 rounded-full opacity-35 blur-3xl"
         style={{
           background: "radial-gradient(circle, var(--accent), var(--rail) 55%, transparent 75%)",
         }}
@@ -56,7 +56,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3">
-            <Logo size="lg" />
+            <Logo size="xl" />
           </div>
           <h1 className="text-xl font-semibold text-text">EduPhone Manager</h1>
           <p className="mt-1 text-sm text-text-muted">Đăng nhập để tiếp tục</p>

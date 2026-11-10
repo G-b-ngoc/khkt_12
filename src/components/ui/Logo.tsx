@@ -5,6 +5,7 @@ const SIZE_PX = {
   sm: { outer: 36, img: 28, radius: 10 },
   md: { outer: 44, img: 34, radius: 12 },
   lg: { outer: 64, img: 50, radius: 18 },
+  xl: { outer: 80, img: 62, radius: 22 },
 } as const;
 
 /**
@@ -16,7 +17,7 @@ export function Logo({
   size = "md",
   className,
 }: {
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   className?: string;
 }) {
   const { outer, img, radius } = SIZE_PX[size];
