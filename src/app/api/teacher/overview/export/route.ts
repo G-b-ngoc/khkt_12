@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
     const exportRows: ExportRow[] = rows.map((r, i) => ({ ...r, stt: i + 1 }));
     const columns = buildColumns();
     const classLabel = slugifyClassCodes(classes.map((c) => c.code));
-    const baseName = `Bao_cao_TB_Lop_${classLabel}_${date}`;
+    const baseName = `Bao_cao_Edu_Lop_${classLabel}_${date}`;
 
     await writeAuditLog({
       actorId: user.id,

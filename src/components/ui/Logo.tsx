@@ -8,7 +8,7 @@ const SIZE_PX = {
 } as const;
 
 /**
- * Biểu tượng thương hiệu TB Phone Manager dùng chung toàn hệ thống (title bar, sidebar,
+ * Biểu tượng thương hiệu EduPhone Manager dùng chung toàn hệ thống (title bar, sidebar,
  * trang đăng nhập) — logo do người dùng cung cấp (`public/logo.png`). Logo đã có màu xanh mực
  * nên chỉ đặt trên ô trắng bo góc, viền mảnh: rõ trên cả nền sáng lẫn nền thanh điều hướng đậm.
  */
@@ -30,7 +30,7 @@ export function Logo({
     >
       <Image
         src="/logo.png"
-        alt="TB Phone Manager"
+        alt="EduPhone Manager"
         width={img}
         height={img}
         sizes={`${img}px`}
@@ -57,7 +57,7 @@ export function LogoWithWordmark({
       <Logo size={size} />
       <span className="flex flex-col leading-tight">
         <span className={clsx("text-sm font-semibold", onDark ? "text-rail-fg" : "text-text")}>
-          TB Phone Manager
+          EduPhone Manager
         </span>
         <span className={clsx("text-[11px]", onDark ? "text-rail-muted" : "text-text-muted")}>
           Quản lý cất/trả điện thoại

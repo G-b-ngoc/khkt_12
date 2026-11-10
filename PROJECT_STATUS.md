@@ -1,4 +1,4 @@
-# PROJECT_STATUS — TB Phone Manager
+# PROJECT_STATUS — EduPhone Manager
 
 Cập nhật: 2026-11-09 (Phase 0–10: đủ 3 cấp phân quyền + báo cáo cuối tuần + test tự động + nhập danh sách từ file + Theo dõi toàn trường/điều chỉnh trạng thái (Cấp 3) + xuất báo cáo Cấp 2 + nâng cấp giao diện toàn hệ thống + điều chỉnh trạng thái cho Cấp 2)
 
