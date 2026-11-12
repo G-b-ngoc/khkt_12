@@ -1,15 +1,24 @@
 import { prisma } from "@/lib/prisma";
 import type { TransactionType } from "@prisma/client";
+import { dayBoundsInAppTimezone, todayInAppTimezone } from "@/lib/timezone";
 
 export type PhoneStatus = "IN" | "OUT"; // IN = điện thoại đang được nhà trường cất giữ
 
-/** Trạng thái hiện tại của học sinh dựa trên giao dịch gần nhất (nguồn sự thật duy nhất). */
+/**
+ * Trạng thái hiện tại của học sinh — CHỈ xét trong NGÀY NGHIỆP VỤ hôm nay (Asia/Ho_Chi_Minh).
+ * Mỗi ngày là một phiên cất/trả độc lập ("daily session" suy ra từ dữ liệu, không lưu bảng
+ * riêng): sang ngày mới mà chưa có giao dịch nào hôm nay, học sinh tự động coi như "chưa cất"
+ * (OUT) dù hôm trước có cất mà quên trả — không cần job/cron reset lúc 00:00, không cần sửa
+ * dữ liệu, chỉ thu hẹp phạm vi truy vấn theo ngày. Giao dịch của ngày trước vẫn còn nguyên
+ * trong DB và vẫn xem được qua Theo dõi (src/lib/overview.ts) cho đúng ngày đó.
+ */
 export async function getStudentPhoneStatus(studentId: string): Promise<PhoneStatus> {
+  const { start, end } = dayBoundsInAppTimezone(todayInAppTimezone());
   const last = await prisma.phoneTransaction.findFirst({
-    where: { studentId },
+    where: { studentId, createdAt: { gte: start, lt: end } },
     orderBy: { createdAt: "desc" },
   });
-  if (!last) return "OUT"; // chưa từng cất -> coi như đang giữ điện thoại ở học sinh
+  if (!last) return "OUT"; // chưa có giao dịch nào hôm nay -> phiên mới, coi như chưa cất
   return last.type === "CHECK_IN" ? "IN" : "OUT";
 }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUser, requireRole, getAssignedClassIds, authErrorResponse } from "@/lib/auth/guard";
+import { dayBoundsInAppTimezone, isValidDateStr, todayInAppTimezone } from "@/lib/timezone";
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,11 +12,13 @@ export async function GET(req: NextRequest) {
     const type = req.nextUrl.searchParams.get("type"); // CHECK_IN | CHECK_OUT | null (cả hai)
     const dateParam = req.nextUrl.searchParams.get("date"); // YYYY-MM-DD, mặc định hôm nay
 
-    const day = dateParam ? new Date(dateParam) : new Date();
-    const start = new Date(day);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(start);
-    end.setDate(end.getDate() + 1);
+    const dateStr = dateParam ?? todayInAppTimezone();
+    if (!isValidDateStr(dateStr)) {
+      return NextResponse.json({ error: "Ngày không hợp lệ" }, { status: 400 });
+    }
+    // Ngày nghiệp vụ theo Asia/Ho_Chi_Minh — KHÔNG dùng setHours(0,0,0,0) theo giờ máy chủ
+    // (Vercel chạy UTC), tránh "hôm nay" bị lệch ngày.
+    const { start, end } = dayBoundsInAppTimezone(dateStr);
 
     const transactions = await prisma.phoneTransaction.findMany({
       where: {
